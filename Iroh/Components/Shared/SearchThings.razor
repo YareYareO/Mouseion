@@ -1,0 +1,43 @@
+﻿@inject ISearchThingService SearchThingService
+@attribute [StreamRendering]
+
+@if (things == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>CreatedAt</th>
+                <th>Upvotes</th>
+                <th>App</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var thing in things)
+            {
+                <tr>
+                    <td>@thing.Name</td>
+                    <td>@thing.Description</td>
+                    <td>@thing.CreatedAt.ToString()</td>
+                    <td>@thing.Upvotes.ToString()</td>
+                    <td>@thing.App.ToString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    
+    private List<Thing>? things;
+
+    protected override async Task OnInitializedAsync()
+    {
+        things = await SearchThingService.GetAll();
+    }
+}

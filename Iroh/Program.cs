@@ -1,6 +1,7 @@
 using Iroh.Components;
 using Iroh.Components.Account;
 using Iroh.Data;
+using Iroh.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,7 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
+builder.Services.AddScoped<ISearchThingService, SearchThingService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
