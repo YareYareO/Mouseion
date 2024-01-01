@@ -1,7 +1,67 @@
-﻿<h3>Create</h3>
+﻿@page "/thing/edit"
+@page "/thing/edit/{Id:int}"
+@inject IThingService ThingService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@if(Id is null)
+{
+    <PageTitle>Create new Thing</PageTitle>
+    <h1>Create new Thing</h1>
+}
+else
+{
+    <PageTitle>Edit @CurrentThing.Name</PageTitle>
+    <h1>Edit @CurrentThing.Name</h1>
+}
+
+<EditForm Model="CurrentThing" OnSubmit="HandleSubmit">
+    <div>
+        <label for="name">Name</label>
+        <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control"/>
+    </div>
+    <div>
+        <label for="desc">Description</label>
+        <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Submit</button>
+
+</EditForm>
+
 
 
 
 @code {
+    [Parameter]
+    public int? Id { get; set; }
 
+    public Thing CurrentThing { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            if (Id is not null)
+            {
+                var thing = await ThingService.FindAsync((int)Id);
+                CurrentThing = thing;
+            }
+        }
+        catch(Exception)
+        {
+            throw;
+        }
+    }
+    async Task HandleSubmit()
+    {
+        if(Id is not null)
+        {
+            await ThingService.UpdateAsync(CurrentThing, (int)Id);
+            NavigationManager.NavigateTo("/search");
+            return;
+        }
+        await ThingService.CreateAsync(CurrentThing);
+        NavigationManager.NavigateTo("/search");
+        return;
+    }
 }

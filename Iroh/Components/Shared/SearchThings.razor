@@ -1,5 +1,31 @@
 ﻿@inject ISearchThingService SearchThingService
-@attribute [StreamRendering]
+@inject NavigationManager NavigationManager
+@using System.Linq
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+@if(tags != null && chosen != null)
+{
+    @for (int i = 0; i < tags.Count; i++)
+    {
+        var index = i;
+        <label class="btn">
+            <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
+        </label>
+    }
+}
+<br />
+<InputRadioGroup @bind-Value="sortBy">
+    <label class="btn">
+        <InputRadio Value="@sortOptions[0]"/> @sortOptions[0]
+    </label>
+    <label class="btn">
+        <InputRadio Value="@sortOptions[1]"/> @sortOptions[1]
+    </label>
+</InputRadioGroup>
+
+<button @onclick="@(() => Search())">Search</button>
+
+<p>@sortBy</p>
 
 @if (things == null)
 {
@@ -15,6 +41,7 @@ else
                 <th>CreatedAt</th>
                 <th>Upvotes</th>
                 <th>App</th>
+                <th>Edit</th>
             </tr>
         </thead>
         <tbody>
@@ -26,6 +53,7 @@ else
                     <td>@thing.CreatedAt.ToString()</td>
                     <td>@thing.Upvotes.ToString()</td>
                     <td>@thing.App.ToString()</td>
+                    <td><button class="btn btn-primary" @onclick="@(() => EditThing(thing.Id))">Edit</button></td>
                 </tr>
             }
         </tbody>
@@ -33,11 +61,42 @@ else
 }
 
 @code {
-    
+
     private List<Thing>? things;
+    private List<Tag>? tags;
+    bool[]? chosen;
+    private string? sortBy;
+    private string[] sortOptions = ["Upvotes", "New"];
 
     protected override async Task OnInitializedAsync()
     {
-        things = await SearchThingService.GetAll();
+
+        tags = await SearchThingService.AllTags();
+        chosen = new bool[tags.Count];
+        sortBy = sortOptions[0];
+        things = await Search();
     }
+    private void EditThing(int id)
+    {
+        NavigationManager.NavigateTo($"/thing/edit/{id}");
+    }
+    private async Task<List<Thing>> Search()
+    {
+
+        List<int> chosenTagIds = new List<int>();
+        if(tags is not null && tags.Count > 0 && chosen is not null)
+        {
+            Tag[] chosenTags = tags.Where((tag, index) => chosen[index]).ToArray();
+            chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
+        }
+        else
+        {
+            chosenTagIds.Add(tags[0].Id);
+        }
+
+        return await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy);
+        
+        
+    }
+
 }

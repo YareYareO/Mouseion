@@ -6,25 +6,21 @@ namespace Iroh.Services
     public class ThingService(ApplicationDbContext context) : IThingService
     {
         private readonly ApplicationDbContext _context = context;
-        public async Task<bool> CreateAsync(Thing thing)
+        public async Task CreateAsync(Thing thing)
         {
             try
             {
                 _context.Things.Add(thing);
                 await _context.SaveChangesAsync();
                 Log.Information("Created: {@thing}", thing);
-                return true;
             }
             catch (Exception)
             {
                 Log.Error("Create failed: {@thing}", thing);
                 throw;
             }
-
-
         }
-
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
             try
             {
@@ -34,9 +30,9 @@ namespace Iroh.Services
                     _context.Things.Remove(toDelete);
                     await _context.SaveChangesAsync();
                     Log.Information($"Deleted: {toDelete}");
-                    return true;
+                    return;
                 }
-                return false;
+                throw new Exception();
             }
             catch (Exception)
             {
@@ -44,23 +40,21 @@ namespace Iroh.Services
                 throw;
             }
         }
-
-
-        public async Task<bool> UpdateAsync(Thing thing)
+        public async Task UpdateAsync(Thing thing, int id)
         {
             try
             {
-                var toUpdate = await _context.Things.FindAsync(thing.Id);
+                var toUpdate = await _context.Things.FindAsync(id);
                 if (toUpdate != null)
                 {
                     toUpdate.Name = thing.Name;
                     toUpdate.Description = thing.Description;
-                    toUpdate.App = thing.App;
+                    //toUpdate.App = thing.App;
                     await _context.SaveChangesAsync();
                     Log.Information($"Updated: {thing}");
-                    return true;
+                    return;
                 }
-                return false;
+                throw new Exception();
             }
             catch (Exception)
             {
@@ -68,5 +62,22 @@ namespace Iroh.Services
                 throw;
             }
         }
+        public async Task<Thing> FindAsync(int id)
+        {
+            try
+            {
+                var thing = await _context.Things.FindAsync(id);
+                if (thing != null)
+                {
+                    return thing;
+                }
+                throw new InvalidDataException("Thing not found.");
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
     }
+
 }

@@ -36,8 +36,9 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
+//My services
 builder.Services.AddScoped<ISearchThingService, SearchThingService>();
+builder.Services.AddScoped<IThingService, ThingService>();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()

@@ -8,6 +8,7 @@ namespace Iroh.Data
         public DbSet<Thing> Things {  get; set; } = default!;
         public DbSet<Tag> Tags { get; set; } = default!;
         public DbSet<Upvote> Upvotes { get; set; } = default!;
+        public DbSet<Description> Descriptions { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

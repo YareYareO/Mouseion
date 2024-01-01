@@ -1,13 +1,18 @@
 ﻿@page "/search"
-@attribute [StreamRendering]
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 
 <PageTitle>Search Things</PageTitle>
 
 <h3>Search for Things!</h3>
+<button @onclick="@(() => CreateGame())">Create New</button>
 
 <Iroh.Components.Shared.SearchThings/>
 
 @code {
-    
+    private void CreateGame()
+    {
+        NavigationManager.NavigateTo("/thing/edit");
+    }
 }
