@@ -25,8 +25,6 @@
 
 <button @onclick="@(() => Search())">Search</button>
 
-<p>@sortBy</p>
-
 @if (things == null)
 {
     <p><em>Loading...</em></p>
@@ -62,39 +60,47 @@ else
 
 @code {
 
-    private List<Thing>? things;
-    private List<Tag>? tags;
-    bool[]? chosen;
-    private string? sortBy;
-    private string[] sortOptions = ["Upvotes", "New"];
+    private List<Thing> things;
+    private List<Tag> tags;
+    private bool[] chosen;
+    private string sortBy;
+    private string[] sortOptions;
+
+    public SearchThings()
+    {
+        things = new List<Thing>();
+        tags = new List<Tag>();
+        chosen = new bool[0];
+        sortBy = String.Empty;
+        sortOptions = ["Upvotes", "New"];
+    }
 
     protected override async Task OnInitializedAsync()
     {
-
         tags = await SearchThingService.AllTags();
         chosen = new bool[tags.Count];
         sortBy = sortOptions[0];
-        things = await Search();
+        await Search();
     }
     private void EditThing(int id)
     {
         NavigationManager.NavigateTo($"/thing/edit/{id}");
     }
-    private async Task<List<Thing>> Search()
+    private async Task Search()
     {
 
         List<int> chosenTagIds = new List<int>();
-        if(tags is not null && tags.Count > 0 && chosen is not null)
-        {
-            Tag[] chosenTags = tags.Where((tag, index) => chosen[index]).ToArray();
-            chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
-        }
-        else
-        {
-            chosenTagIds.Add(tags[0].Id);
-        }
+            if(chosen.All(tag => tag))
+            {
+                Tag[] chosenTags = tags.Where((tag, index) => chosen[index]).ToArray();
+                chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
+            }
+            else
+            {
+                chosenTagIds.Add(tags[0].Id);
+            }
 
-        return await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy);
+        things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy);
         
         
     }
