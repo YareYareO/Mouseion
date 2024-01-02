@@ -2,7 +2,7 @@
 {
     public enum UsedInApp
     {
-       Product,
+       Products,
        History,
        Both
     }

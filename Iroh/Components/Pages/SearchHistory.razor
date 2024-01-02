@@ -1,14 +1,14 @@
-﻿@page "/search"
+﻿@page "/search/history"
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 
-<PageTitle>Search Things</PageTitle>
+<PageTitle>Search History</PageTitle>
 
-<h3>Search for Things!</h3>
+<h3>Search for History!</h3>
 <button @onclick="@(() => CreateGame())">Create New</button>
 
-<Iroh.Components.Shared.SearchThings/>
+<Iroh.Components.Shared.Search app=@UsedInApp.History/>
 
 @code {
     private void CreateGame()

@@ -1,23 +1,33 @@
 ﻿using Iroh.Data;
-using Serilog;
+
 
 namespace Iroh.Helpers
 {
     public class ThingQuerier
     {
         private readonly ApplicationDbContext _context;
-        public ThingQuerier(ApplicationDbContext context)
+        private UsedInApp app;
+        private List<int> chosentags;
+        private int currentPage;
+        private string sortBy;
+        private int skipItems;
+        private int itemsPerPage;
+        public ThingQuerier(ApplicationDbContext context, List<int> chosentags, int currentPage, string sortBy, UsedInApp app)
         {
             _context = context;
+            this.app = app;
+            this.chosentags = chosentags;
+            this.currentPage = currentPage;
+            this.sortBy = sortBy;
+
+            skipItems = 0;
+            itemsPerPage = 20;
         }
 
-        private int _skipItems = 0;
-        private int _itemsPerPage = 20;
-        public IQueryable<Thing> GetSortedThings(List<int> chosentags, int currentPage = 1, string sortBy = "Upvotes")
+        public IQueryable<Thing> GetSortedThings()
         {
-            _skipItems = (currentPage - 1) * _itemsPerPage;
-
-            IQueryable<Thing> query = SortThings(GetThingsByTags(chosentags), sortBy);
+            skipItems = (this.currentPage - 1) * this.itemsPerPage;
+            IQueryable<Thing> query = SortThings(GetThingsByTags(this.chosentags), this.sortBy);
             return query;
         }
         private IQueryable<Thing> GetThingsByTags(IEnumerable<int> tagIds)
@@ -28,8 +38,8 @@ namespace Iroh.Helpers
                 .GroupBy(description => description.ThingId)
                 .Where(group => group.Count() == tagIds.Count())
                 .Select(group => group.Key);
-
             return _context.Things.Where(thing => things.Contains(thing.Id));
+            //return things2.Where(t => t.App == this.app);
         }
         private IQueryable<Thing> SortThings(IQueryable<Thing> things, string sortBy)
         {
@@ -49,15 +59,16 @@ namespace Iroh.Helpers
         {
             return things.OrderByDescending(t => t.CreatedAt)
                                                 .Select(t => t)
-                                                .Skip(_skipItems)
-                                                .Take(_itemsPerPage);
+                                                .Skip(skipItems)
+                                                .Take(itemsPerPage);
         }
         private IQueryable<Thing> SortByUpvotes(IQueryable<Thing> things)
         {
             return things.OrderByDescending(t => t.Upvotes)
-                                                .Skip(_skipItems)
-                                                .Take(_itemsPerPage);
+                                                .Skip(skipItems)
+                                                .Take(itemsPerPage);
         }
 
+        
     }
 }

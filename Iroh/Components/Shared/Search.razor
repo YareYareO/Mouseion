@@ -3,6 +3,7 @@
 @using System.Linq
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
+<br />
 @if(tags != null && chosen != null)
 {
     @for (int i = 0; i < tags.Count; i++)
@@ -23,13 +24,12 @@
     </label>
 </InputRadioGroup>
 
-<button @onclick="@(() => Search())">Search</button>
-
+<button @onclick="@(() => StartSearch())">Search</button>
+    
 @if (things == null)
 {
     <p><em>Loading...</em></p>
-}
-else
+}else
 {
     <table class="table">
         <thead>
@@ -59,50 +59,38 @@ else
 }
 
 @code {
-
-    private List<Thing> things;
-    private List<Tag> tags;
-    private bool[] chosen;
-    private string sortBy;
-    private string[] sortOptions;
-
-    public SearchThings()
-    {
-        things = new List<Thing>();
-        tags = new List<Tag>();
-        chosen = new bool[0];
-        sortBy = String.Empty;
-        sortOptions = ["Upvotes", "New"];
-    }
+    [Parameter]
+    public UsedInApp app { get; set; }
+    private List<Thing>? things;
+    private List<Tag>? tags;
+    private bool[]? chosen;
+    private string[] sortOptions = ["Upvotes", "New"];
+    private string? sortBy;
 
     protected override async Task OnInitializedAsync()
     {
         tags = await SearchThingService.AllTags();
         chosen = new bool[tags.Count];
         sortBy = sortOptions[0];
-        await Search();
+        await StartSearch();
     }
     private void EditThing(int id)
     {
         NavigationManager.NavigateTo($"/thing/edit/{id}");
     }
-    private async Task Search()
+    private async Task StartSearch()
     {
-
         List<int> chosenTagIds = new List<int>();
-            if(chosen.All(tag => tag))
-            {
-                Tag[] chosenTags = tags.Where((tag, index) => chosen[index]).ToArray();
-                chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
-            }
-            else
-            {
-                chosenTagIds.Add(tags[0].Id);
-            }
-
-        things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy);
-        
-        
+        if(!chosen.All(tag => !tag))
+        {
+            Tag[] chosenTags = tags.Where((tag, index) => chosen[index]).ToArray();
+            chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
+        }
+        else
+        {
+            chosenTagIds.Add(tags[0].Id);
+        }
+        things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: app);
     }
 
 }

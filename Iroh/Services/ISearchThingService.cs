@@ -6,6 +6,6 @@ namespace Iroh.Services
     {
         public Task<List<Thing>> GetAll();
         public Task<List<Tag>> AllTags();
-        public Task<List<Thing>> GetThingsByTags(List<int> tags, string sortBy);
+        public Task<List<Thing>> GetThingsByTags(List<int> tags, string sortBy, UsedInApp app);
     }
 }
