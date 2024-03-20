@@ -2,10 +2,11 @@
 @page "/thing/edit/{Id:int}"
 @inject IThingService ThingService
 @inject NavigationManager NavigationManager
+@inject ISearchThingService SearchThingService
 @rendermode InteractiveServer
 
 @if(Id is null)
-{
+{   // Page Headline
     <PageTitle>Create new Thing</PageTitle>
     <h1>Create new Thing</h1>
 }
@@ -14,8 +15,20 @@ else
     <PageTitle>Edit @CurrentThing.Name</PageTitle>
     <h1>Edit @CurrentThing.Name</h1>
 }
+<br />
+@if (tags != null && chosen != null)
+{   // Display all Tags to choose from
+    @for (int i = 0; i < tags.Count; i++)
+    {
+        var index = i;
+        <label class="btn">
+            <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
+        </label>
+    }
+}
 
 <EditForm Model="CurrentThing" OnSubmit="HandleSubmit">
+    <!--Input for the Thing. Submit button at the end.-->
     <div>
         <label for="name">Name</label>
         <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control"/>
@@ -24,6 +37,7 @@ else
         <label for="desc">Description</label>
         <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
     </div>
+    
     <button type="submit" class="btn btn-primary">Submit</button>
 
 </EditForm>
@@ -36,9 +50,13 @@ else
     public int? Id { get; set; }
 
     public Thing CurrentThing { get; set; } = new();
+    private List<Tag>? tags;
+    private bool[]? chosen;
 
     protected override async Task OnInitializedAsync()
     {
+        tags = await SearchThingService.AllTags();
+        chosen = new bool[tags.Count];
         try
         {
             if (Id is not null)
@@ -54,14 +72,26 @@ else
     }
     async Task HandleSubmit()
     {
+        //Prepare List of thingids
+        List<int> chosenTagIds = new List<int>();
+        for(int i = 0; i < chosen.Length; i++)
+        {
+            if (chosen[i])
+            {
+                chosenTagIds.Add(tags[i].Id);
+            }
+        }
+
         if(Id is not null)
         {
             await ThingService.UpdateAsync(CurrentThing, (int)Id);
-            NavigationManager.NavigateTo("/search");
+            await ThingService.UpdateDescriptions(chosenTagIds, (int)Id);
+            NavigationManager.NavigateTo("/search/history");
             return;
         }
-        await ThingService.CreateAsync(CurrentThing);
-        NavigationManager.NavigateTo("/search");
+        int thingId = await ThingService.CreateAsync(CurrentThing);
+        await ThingService.UpdateDescriptions(chosenTagIds, thingId);
+        NavigationManager.NavigateTo("/search/history");
         return;
     }
 }

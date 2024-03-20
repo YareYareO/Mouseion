@@ -1,18 +1,22 @@
 ﻿using Iroh.Data;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Linq.Expressions;
 
 namespace Iroh.Services
 {
     public class ThingService(ApplicationDbContext context) : IThingService
     {
         private readonly ApplicationDbContext _context = context;
-        public async Task CreateAsync(Thing thing)
+        public async Task<int> CreateAsync(Thing thing)
         {
             try
             {
+                thing.CreatedAt = DateTime.Now;
                 _context.Things.Add(thing);
                 await _context.SaveChangesAsync();
                 Log.Information("Created: {@thing}", thing);
+                return thing.Id;
             }
             catch (Exception)
             {
@@ -77,6 +81,29 @@ namespace Iroh.Services
             {
                 throw;
             }
+        }
+        public async Task UpdateDescriptions(List<int> chosenTags, int thingId)
+        {
+                var oldDescriptions = await _context.Descriptions
+                                    .Where(d => d.ThingId == thingId)
+                                    .ToListAsync();
+
+                // Determine tags for addition and removal
+                var tagsToAdd = chosenTags.Except(oldDescriptions.Select(d => d.TagId));
+                var tagsToRemove = oldDescriptions.Where(d => !chosenTags.Contains(d.TagId))
+                    .Select(d => d.TagId);
+
+                // Add new descriptions in a single batch
+                foreach (int tagId in tagsToAdd)
+                {
+                    _context.Descriptions.Add(new Description { ThingId = thingId, TagId = tagId });
+                }
+
+                // Remove old descriptions efficiently
+                _context.Descriptions.RemoveRange(oldDescriptions.Where(d => tagsToRemove.Contains(d.TagId)));
+
+                // Save changes in a single operation
+                await _context.SaveChangesAsync();
         }
     }
 
