@@ -51,7 +51,7 @@
                     <td>@thing.CreatedAt.ToString()</td>
                     <td>@thing.Upvotes.ToString()</td>
                     <td>@thing.App.ToString()</td>
-                    <td><button class="btn btn-primary" @onclick="@(() => EditThing(thing.Id))">Edit</button></td>
+                    <td><button class="btn btn-primary" @onclick="@(() => EditThing(thing.Id, thing.App))">Edit</button></td>
                 </tr>
             }
         </tbody>
@@ -69,14 +69,19 @@
 
     protected override async Task OnInitializedAsync()
     {
-        tags = await SearchThingService.AllTags();
+        tags = await SearchThingService.GetAllTags(app);
         chosen = new bool[tags.Count];
         sortBy = sortOptions[0];
         await StartSearch();
     }
-    private void EditThing(int id)
+    private void EditThing(int id, UsedInApp app)
     {
-        NavigationManager.NavigateTo($"/thing/edit/{id}");
+        string used = "FALSE";
+        if(app == UsedInApp.History)
+        {
+            used = "true";
+        }
+        NavigationManager.NavigateTo($"/thing/edit/{used}/{id}");
     }
     private async Task StartSearch()
     {

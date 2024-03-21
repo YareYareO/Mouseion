@@ -1,5 +1,5 @@
-﻿@page "/thing/edit"
-@page "/thing/edit/{Id:int}"
+﻿@page "/thing/edit/{App:bool}"
+@page "/thing/edit/{App:bool}/{Id:int}"
 @inject IThingService ThingService
 @inject NavigationManager NavigationManager
 @inject ISearchThingService SearchThingService
@@ -22,7 +22,7 @@ else
     {
         var index = i;
         <label class="btn">
-            <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
+            <input type="checkbox" @bind-value="chosen[index]" /> @tags[i].Name
         </label>
     }
 }
@@ -42,12 +42,11 @@ else
 
 </EditForm>
 
-
-
-
 @code {
     [Parameter]
     public int? Id { get; set; }
+    [Parameter]
+    public bool App { get; set;} //True ist History
 
     public Thing CurrentThing { get; set; } = new();
     private List<Tag>? tags;
@@ -55,7 +54,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        tags = await SearchThingService.AllTags();
+        UsedInApp app = App ? UsedInApp.History : UsedInApp.Products;
+        tags = await SearchThingService.GetAllTags(app);
         chosen = new bool[tags.Count];
         try
         {
