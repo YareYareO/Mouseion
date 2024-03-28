@@ -9,12 +9,12 @@ namespace Iroh.Services
     {
         private readonly ApplicationDbContext _context = context;
 
-        public async Task<List<Tag>> AllTags()
+        /*public async Task<List<Tag>> AllTags()
         {
             var tags = await _context.Tags.ToListAsync();
             return tags;
-        }
-        public async Task<List<Tag>> GetAllTags(UsedInApp app)
+        }*/
+        public async Task<List<Tag>> GetTagsByApp(UsedInApp app)
         {
             var tags = await _context.Tags.Where(tag => (tag.App == app) | (tag.App == UsedInApp.Both)).ToListAsync();
             return tags;
