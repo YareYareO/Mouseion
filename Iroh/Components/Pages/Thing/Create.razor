@@ -1,8 +1,10 @@
 ﻿@page "/thing/edit/{App:bool}"
 @page "/thing/edit/{App:bool}/{Id:int}"
+@using Iroh.Components.Account <!-- for IdentityUserAccessor -->
 @inject IThingService ThingService
 @inject NavigationManager NavigationManager
 @inject ISearchThingService SearchThingService
+@inject IdentityUserAccessor UserAccessor
 @rendermode InteractiveServer
 
 @if(Id is null)
@@ -43,20 +45,26 @@ else
 </EditForm>
 
 @code {
+    //[CascadingParameter]
+    //private HttpContext HttpContext { get; set; } = default!; // to get the user
     [Parameter]
     public int? Id { get; set; }
     [Parameter]
-    public bool App { get; set;} //True ist History
+    public bool App { get; set;} //True is History
 
     public Thing CurrentThing { get; set; } = new();
     private List<Tag>? tags;
     private bool[]? chosen;
+    //private ApplicationUser user = default!;
 
     protected override async Task OnInitializedAsync()
     {
         UsedInApp app = App ? UsedInApp.History : UsedInApp.Products;
-        tags = await SearchThingService.GetAllTags(app);
+        tags = await SearchThingService.GetTagsByApp(app);
         chosen = new bool[tags.Count];
+        //Console.WriteLine(HttpContext == null); //baustell
+        //user = await UserAccessor.GetRequiredUserAsync(HttpContext); //baustell
+        //CurrentThing.Creator = user.Id;
         try
         {
             if (Id is not null)
@@ -72,7 +80,7 @@ else
     }
     async Task HandleSubmit()
     {
-        //Prepare List of thingids
+        //Prepare List of tag ids to make descriptions
         List<int> chosenTagIds = new List<int>();
         for(int i = 0; i < chosen.Length; i++)
         {
@@ -81,7 +89,7 @@ else
                 chosenTagIds.Add(tags[i].Id);
             }
         }
-
+        // Update
         if(Id is not null)
         {
             await ThingService.UpdateAsync(CurrentThing, (int)Id);
@@ -89,6 +97,7 @@ else
             NavigationManager.NavigateTo("/search/history");
             return;
         }
+        // Create New
         int thingId = await ThingService.CreateAsync(CurrentThing);
         await ThingService.UpdateDescriptions(chosenTagIds, thingId);
         NavigationManager.NavigateTo("/search/history");

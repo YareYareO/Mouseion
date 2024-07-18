@@ -1,0 +1,36 @@
+﻿@page "/Account/Manage/UserThings"
+@inject ISearchThingService SearchThingService
+@inject IdentityUserAccessor UserAccessor
+
+<h3>UserThings</h3>
+@if(user is not null)
+{
+    <p> @user.Id</p>
+}
+
+@if(things is not null)
+{
+    @foreach (Thing thing in things)
+    {
+        <p>@thing.Name</p>
+    }
+}
+
+
+@code {
+    [CascadingParameter]
+    private HttpContext HttpContext { get; set; } = default!;
+
+    ApplicationUser user = default!;
+
+    List<Thing> things = default!;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+
+        things = await SearchThingService.GetThingsByCreator(user.Id);
+    }
+
+}

@@ -69,7 +69,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        tags = await SearchThingService.GetAllTags(app);
+        tags = await SearchThingService.GetTagsByApp(app);
         chosen = new bool[tags.Count];
         sortBy = sortOptions[0];
         await StartSearch();
