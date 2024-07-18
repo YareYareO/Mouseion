@@ -1,12 +1,14 @@
 ﻿@page "/thing/edit/{App:bool}"
 @page "/thing/edit/{App:bool}/{Id:int}"
-@using Iroh.Components.Account <!-- for IdentityUserAccessor -->
 @inject IThingService ThingService
 @inject NavigationManager NavigationManager
 @inject ISearchThingService SearchThingService
-@inject IdentityUserAccessor UserAccessor
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
 @rendermode InteractiveServer
 
+<p>User ID: @userId</p>
 @if(Id is null)
 {   // Page Headline
     <PageTitle>Create new Thing</PageTitle>
@@ -17,7 +19,7 @@ else
     <PageTitle>Edit @CurrentThing.Name</PageTitle>
     <h1>Edit @CurrentThing.Name</h1>
 }
-<br />
+<br/>
 @if (tags != null && chosen != null)
 {   // Display all Tags to choose from
     @for (int i = 0; i < tags.Count; i++)
@@ -45,8 +47,6 @@ else
 </EditForm>
 
 @code {
-    //[CascadingParameter]
-    //private HttpContext HttpContext { get; set; } = default!; // to get the user
     [Parameter]
     public int? Id { get; set; }
     [Parameter]
@@ -55,16 +55,23 @@ else
     public Thing CurrentThing { get; set; } = new();
     private List<Tag>? tags;
     private bool[]? chosen;
-    //private ApplicationUser user = default!;
+    private string userId;
+
 
     protected override async Task OnInitializedAsync()
     {
         UsedInApp app = App ? UsedInApp.History : UsedInApp.Products;
         tags = await SearchThingService.GetTagsByApp(app);
         chosen = new bool[tags.Count];
-        //Console.WriteLine(HttpContext == null); //baustell
-        //user = await UserAccessor.GetRequiredUserAsync(HttpContext); //baustell
-        //CurrentThing.Creator = user.Id;
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        }
+        
+        CurrentThing.Creator = (userId!=null) ? userId : "unknown";
         try
         {
             if (Id is not null)

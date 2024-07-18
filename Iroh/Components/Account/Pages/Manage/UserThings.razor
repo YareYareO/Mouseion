@@ -1,8 +1,11 @@
 ﻿@page "/Account/Manage/UserThings"
 @inject ISearchThingService SearchThingService
-@inject IdentityUserAccessor UserAccessor
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h3>UserThings</h3>
+<p>User ID: @userId</p>
 @if(user is not null)
 {
     <p> @user.Id</p>
@@ -25,12 +28,19 @@
 
     List<Thing> things = default!;
 
+    private string? userId;
 
     protected override async Task OnInitializedAsync()
     {
-        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
 
-        things = await SearchThingService.GetThingsByCreator(user.Id);
+        if (user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        }
+    
+        things = await SearchThingService.GetThingsByCreator(userId);
     }
 
 }

@@ -51,6 +51,7 @@
                     <td>@thing.CreatedAt.ToString()</td>
                     <td>@thing.Upvotes.ToString()</td>
                     <td>@thing.App.ToString()</td>
+                    <td>@thing.Creator.ToString()</td>
                     <td><button class="btn btn-primary" @onclick="@(() => EditThing(thing.Id, thing.App))">Edit</button></td>
                 </tr>
             }
