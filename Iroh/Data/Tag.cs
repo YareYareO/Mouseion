@@ -9,19 +9,13 @@ namespace Iroh.Data
         {
             Name = String.Empty;
         }
-        public Tag(string name, int? parent, UsedInApp app, TagType type)
+        public Tag(string name, UsedInApp app)
         {
             Name = name;
-            Parent = parent;
-            App = app;
-            TagType = type;
         }
         public int Id { get; set; }
         [Column(TypeName = "nvarchar(50)")]
         public string Name { get; set; }
-        public int? Parent { get; set; }
-
-        public UsedInApp App { get; set; }
-        public TagType TagType { get; set; }
+        public TagFamily Family { get; set; }
     }
 }

@@ -1,8 +1,9 @@
-﻿@page "/thing/edit/{App:bool}"
-@page "/thing/edit/{App:bool}/{Id:int}"
+﻿@page "/thing/edit/{AppString}"
+@page "/thing/edit/{AppString}/{Id:int}"
 @inject IThingService ThingService
 @inject NavigationManager NavigationManager
 @inject ISearchThingService SearchThingService
+@inject ITagService TagService
 @using Microsoft.AspNetCore.Components.Authorization
 @using System.Security.Claims
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -50,28 +51,32 @@ else
     [Parameter]
     public int? Id { get; set; }
     [Parameter]
-    public bool App { get; set;} //True is History
+    public string AppString { get; set; }
 
     public Thing CurrentThing { get; set; } = new();
     private List<Tag>? tags;
     private bool[]? chosen;
     private string userId;
+    private UsedInApp App;
 
 
     protected override async Task OnInitializedAsync()
     {
-        UsedInApp app = App ? UsedInApp.History : UsedInApp.Products;
-        tags = await SearchThingService.GetTagsByApp(app);
-        chosen = new bool[tags.Count];
+        App = TagService.GetEnumByString(AppString);
+
+        TagFamily[] families = TagService.GetTagFamilies(App);
+        tags = await SearchThingService.GetTagsByFamilies(families);
+
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
 
-        if (user.Identity.IsAuthenticated)
+        chosen = new bool[tags.Count];
+
+        userId = "unknown";
+        if (user.Identity != null & user.Identity.IsAuthenticated)
         {
             userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        }
-        
-        CurrentThing.Creator = (userId!=null) ? userId : "unknown";
+        }        
         try
         {
             if (Id is not null)
@@ -85,6 +90,7 @@ else
             throw;
         }
     }
+
     async Task HandleSubmit()
     {
         //Prepare List of tag ids to make descriptions
@@ -96,18 +102,21 @@ else
                 chosenTagIds.Add(tags[i].Id);
             }
         }
+        CurrentThing.Creator = userId;
+        CurrentThing.App = App;
         // Update
         if(Id is not null)
         {
             await ThingService.UpdateAsync(CurrentThing, (int)Id);
             await ThingService.UpdateDescriptions(chosenTagIds, (int)Id);
-            NavigationManager.NavigateTo("/search/history");
+            NavigationManager.NavigateTo($"/search/{AppString}");
             return;
         }
         // Create New
+        CurrentThing.Upvotes = 0;
         int thingId = await ThingService.CreateAsync(CurrentThing);
         await ThingService.UpdateDescriptions(chosenTagIds, thingId);
-        NavigationManager.NavigateTo("/search/history");
+        NavigationManager.NavigateTo($"/search/{AppString}");
         return;
     }
 }

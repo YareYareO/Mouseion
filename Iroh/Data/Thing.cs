@@ -6,7 +6,7 @@ namespace Iroh.Data
 {
     public class Thing
     {
-        public Thing() { Name = String.Empty; Description = String.Empty; Creator = String.Empty; App = UsedInApp.Both; }
+        public Thing() { Name = String.Empty; Description = String.Empty; Creator = String.Empty; }
         public Thing(string name, string description, UsedInApp app)
         {
             Name = name;

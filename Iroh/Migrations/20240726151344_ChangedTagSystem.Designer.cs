@@ -4,6 +4,7 @@ using Iroh.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Iroh.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240726151344_ChangedTagSystem")]
+    partial class ChangedTagSystem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -108,12 +111,18 @@ namespace Iroh.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("App")
+                        .HasColumnType("int");
+
                     b.Property<int>("Family")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(50)");
+
+                    b.Property<int?>("Parent")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -158,7 +167,7 @@ namespace Iroh.Migrations
                         {
                             Id = 1,
                             App = 7,
-                            CreatedAt = new DateTime(2024, 7, 26, 17, 19, 19, 628, DateTimeKind.Local).AddTicks(3729),
+                            CreatedAt = new DateTime(2024, 7, 26, 17, 13, 41, 697, DateTimeKind.Local).AddTicks(9624),
                             Creator = "",
                             Description = "Funny Spanish guy gets beat up alot of times",
                             Name = "Don Quijote",

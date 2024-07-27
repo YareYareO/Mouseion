@@ -39,6 +39,7 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 //My services
 builder.Services.AddScoped<ISearchThingService, SearchThingService>();
 builder.Services.AddScoped<IThingService, ThingService>();
+builder.Services.AddScoped<ITagService, TagService>();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()

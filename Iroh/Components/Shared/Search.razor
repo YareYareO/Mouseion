@@ -1,4 +1,5 @@
 ﻿@inject ISearchThingService SearchThingService
+@inject ITagService TagService
 @inject NavigationManager NavigationManager
 @using System.Linq
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
@@ -61,7 +62,7 @@
 
 @code {
     [Parameter]
-    public UsedInApp app { get; set; }
+    public UsedInApp App { get; set; }
     private List<Thing>? things;
     private List<Tag>? tags;
     private bool[]? chosen;
@@ -70,19 +71,16 @@
 
     protected override async Task OnInitializedAsync()
     {
-        tags = await SearchThingService.GetTagsByApp(app);
+        TagFamily[] families = TagService.GetTagFamilies(App);
+        tags = await SearchThingService.GetTagsByFamilies(families);
+
         chosen = new bool[tags.Count];
         sortBy = sortOptions[0];
         await StartSearch();
     }
     private void EditThing(int id, UsedInApp app)
     {
-        string used = "FALSE";
-        if(app == UsedInApp.History)
-        {
-            used = "true";
-        }
-        NavigationManager.NavigateTo($"/thing/edit/{used}/{id}");
+        NavigationManager.NavigateTo($"/thing/edit/{app}/{id}");
     }
     private async Task StartSearch()
     {
@@ -94,9 +92,17 @@
         }
         else
         {
-            chosenTagIds.Add(tags[0].Id);
+            Tag standardTag = tags.Where(tag => tag.Name == App.ToString()).ToList()[0];
+            if(standardTag != null)
+            {
+                chosenTagIds.Add(standardTag.Id);
+            }
+            else
+            {
+                chosenTagIds.Add(tags[0].Id);
+            }
         }
-        things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: app);
+        things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: App);
     }
 
 }

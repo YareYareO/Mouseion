@@ -1,18 +1,19 @@
-﻿@page "/search/products"
+﻿@page "/search/Person"
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 
-<PageTitle>Search Products</PageTitle>
+<PageTitle>Search People</PageTitle>
 
-<h3>Search for Products!</h3>
+<h3>Search for People!</h3>
+
 <button @onclick="@(() => CreateGame())">Create New</button>
-
-<Iroh.Components.Shared.Search app=@UsedInApp.Products />
+<Iroh.Components.Shared.Search app=@Page/>
 
 @code {
+    UsedInApp Page = UsedInApp.Person;
     private void CreateGame()
     {
-        NavigationManager.NavigateTo("/thing/edit/FALSE");
+        NavigationManager.NavigateTo($"/thing/edit/{Page.ToString()}");
     }
 }

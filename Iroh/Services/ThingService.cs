@@ -53,7 +53,8 @@ namespace Iroh.Services
                 {
                     toUpdate.Name = thing.Name;
                     toUpdate.Description = thing.Description;
-                    //toUpdate.App = thing.App;
+                    toUpdate.App = thing.App;
+                    toUpdate.Creator = thing.Creator;
                     await _context.SaveChangesAsync();
                     Log.Information($"Updated: {thing}");
                     return;
