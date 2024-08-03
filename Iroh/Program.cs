@@ -40,6 +40,7 @@ builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSe
 builder.Services.AddScoped<ISearchThingService, SearchThingService>();
 builder.Services.AddScoped<IThingService, ThingService>();
 builder.Services.AddScoped<ITagService, TagService>();
+builder.Services.AddScoped<IUpvoteService, UpvoteService>();
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()

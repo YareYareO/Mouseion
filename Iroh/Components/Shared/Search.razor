@@ -1,9 +1,15 @@
 ﻿@inject ISearchThingService SearchThingService
 @inject ITagService TagService
+@inject IUpvoteService UpvoteService
 @inject NavigationManager NavigationManager
 @using System.Linq
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
+<!-- Tag functionalities -->
 <br />
 @if(tags != null && chosen != null)
 {
@@ -24,9 +30,9 @@
         <InputRadio Value="@sortOptions[1]"/> @sortOptions[1]
     </label>
 </InputRadioGroup>
-
 <button @onclick="@(() => StartSearch())">Search</button>
-    
+
+<!-- Displaying Things-->
 @if (things == null)
 {
     <p><em>Loading...</em></p>
@@ -40,7 +46,8 @@
                 <th>CreatedAt</th>
                 <th>Upvotes</th>
                 <th>App</th>
-                <th>Edit</th>
+                <th>Creator</th>
+                <th>Upvote</th>
             </tr>
         </thead>
         <tbody>
@@ -53,34 +60,48 @@
                     <td>@thing.Upvotes.ToString()</td>
                     <td>@thing.App.ToString()</td>
                     <td>@thing.Creator.ToString()</td>
-                    <td><button class="btn btn-primary" @onclick="@(() => EditThing(thing.Id, thing.App))">Edit</button></td>
+                    <td><button class="btn btn-primary" @onclick="@(() => UpvoteThing(thing.Id, userId))">Vote</button></td>
+
                 </tr>
             }
         </tbody>
     </table>
 }
 
+
+<!-- Code -->
+
 @code {
     [Parameter]
     public UsedInApp App { get; set; }
-    private List<Thing>? things;
+    // for the tag functionalities but also needed for displaying things
     private List<Tag>? tags;
     private bool[]? chosen;
     private string[] sortOptions = ["Upvotes", "New"];
     private string? sortBy;
+    // for displaying things
+    private List<Thing>? things;
+    // for upvote functionalities
+    private string userId;
+
 
     protected override async Task OnInitializedAsync()
     {
+        // for tag functionalities but also needed for displaying things
         TagFamily[] families = TagService.GetTagFamilies(App);
         tags = await SearchThingService.GetTagsByFamilies(families);
-
         chosen = new bool[tags.Count];
         sortBy = sortOptions[0];
+        // for upvote functionalities
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        userId = "unknown";
+        if (user.Identity != null & user.Identity.IsAuthenticated)
+        {
+            userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        }
+        // for displaying things
         await StartSearch();
-    }
-    private void EditThing(int id, UsedInApp app)
-    {
-        NavigationManager.NavigateTo($"/thing/edit/{app}/{id}");
     }
     private async Task StartSearch()
     {
@@ -104,5 +125,28 @@
         }
         things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: App);
     }
-
+    private async void UpvoteThing(int thingid, string userid)
+    {
+        // nutze helper der ein bool zurückgibt wenn true, thing.Upvotes++ und erstelle ein Upvote Objekt (in einem Helper)
+        bool doesExist = await UpvoteService.DoesUpvoteExistAlready(thingid, userid);
+        bool successfullProcess = false;
+        if (doesExist)
+        {
+            successfullProcess = await UpvoteService.RemoveUpvote(thingid, userid);
+        }
+        else
+        {
+            successfullProcess = await UpvoteService.CreateUpvote(thingid, userid);    
+        }
+        if (successfullProcess)
+        {
+            // success message
+            Console.WriteLine("Upvote process successfull");
+        }
+        else 
+        { 
+            // no success message
+            Console.WriteLine("Upvote process not successfull");
+        }
+    }
 }
