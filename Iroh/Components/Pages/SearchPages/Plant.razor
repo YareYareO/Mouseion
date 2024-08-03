@@ -1,0 +1,19 @@
+﻿@page "/search/Plant"
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+
+<PageTitle>Search Plants</PageTitle>
+
+<h3>Search for Plants!</h3>
+
+<button @onclick="@(() => CreateGame())">Create New</button>
+<Iroh.Components.Shared.Search app=@Page />
+
+@code {
+    UsedInApp Page = UsedInApp.Plant;
+    private void CreateGame()
+    {
+        NavigationManager.NavigateTo($"/thing/edit/{Page.ToString()}");
+    }
+}

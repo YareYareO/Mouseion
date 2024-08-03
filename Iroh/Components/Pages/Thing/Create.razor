@@ -83,15 +83,6 @@ else
             {
                 var thing = await ThingService.FindAsync((int)Id);
                 CurrentThing = thing;
-                /*
-                List<int> tagIdsOfThing = TagService.GetTagsByThing(thing.Id);
-                for (int i = 0; i < tags.Count; i++)
-                {
-                    if(tagIdsOfThing.Contains(tags[i].Id))
-                    {
-                        chosen[i] = true;
-                    }
-                } */
             }
         }
         catch(Exception)

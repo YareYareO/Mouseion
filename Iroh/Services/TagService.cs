@@ -22,15 +22,24 @@ namespace Iroh.Services
         }
         public TagFamily[] GetTagFamilies(UsedInApp page) 
         {
-            string pageString = page.ToString();
-            Dictionary<string, TagFamily[]> combinations = new Dictionary<string, TagFamily[]>
+            Dictionary<UsedInApp, TagFamily[]> combinations = new Dictionary<UsedInApp, TagFamily[]>
             {
-                { "Writing", [TagFamily.Writing, TagFamily.Region, TagFamily.Time, TagFamily.Topic, TagFamily.Science, TagFamily.Sport, TagFamily.FictionGenre, TagFamily.Fiction] },
-                { "Person", [TagFamily.Person, TagFamily.Region, TagFamily.Time] }
+                { UsedInApp.Writing, [TagFamily.Writing, TagFamily.Region, TagFamily.Time, TagFamily.Topic, TagFamily.Science, TagFamily.Sport, TagFamily.FictionGenre, TagFamily.Fiction, TagFamily.Genre] },
+                { UsedInApp.Person, [TagFamily.Person, TagFamily.Region, TagFamily.Time, TagFamily.Sport, TagFamily.Science, TagFamily.Topic, TagFamily.Fiction] },
+                { UsedInApp.Art, [TagFamily.Art, TagFamily.Region, TagFamily.Time, TagFamily.Fiction] },
+                { UsedInApp.Place, [TagFamily.Place, TagFamily.Region, TagFamily.Time, TagFamily.Fiction] },
+                { UsedInApp.Event, [TagFamily.Event, TagFamily.Region, TagFamily.Time, TagFamily.Fiction] },
+                { UsedInApp.MotionPicture, [TagFamily.MotionPicture, TagFamily.Region, TagFamily.Time, TagFamily.Topic, TagFamily.Science, TagFamily.Sport, TagFamily.FictionGenre, TagFamily.Genre] },
+                { UsedInApp.Music, [TagFamily.Music, TagFamily.Region, TagFamily.Time, TagFamily.MusicGenre] },
+                { UsedInApp.VideoGame, [TagFamily.Region, TagFamily.FictionGenre, TagFamily.VideoGameGenre] },
+                { UsedInApp.Plant, [TagFamily.Plant, TagFamily.Region, TagFamily.Fiction] },
+                { UsedInApp.Animal, [TagFamily.Animal, TagFamily.Region, TagFamily.Time, TagFamily.Fiction] },
+                { UsedInApp.Game, [TagFamily.Game, TagFamily.Region, TagFamily.Time, TagFamily.Fiction] }
+
             };
-            if (combinations.ContainsKey(pageString))
+            if (combinations.ContainsKey(page))
             {
-                return combinations[pageString];
+                return combinations[page];
             }
             return new TagFamily[0];
         }

@@ -1,0 +1,19 @@
+﻿@page "/search/MotionPicture"
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+
+<PageTitle>Search Motion Picture</PageTitle>
+
+<h3>Search for Motion Picture!</h3>
+
+<button @onclick="@(() => CreateGame())">Create New</button>
+<Iroh.Components.Shared.Search app=@Page />
+
+@code {
+    UsedInApp Page = UsedInApp.MotionPicture;
+    private void CreateGame()
+    {
+        NavigationManager.NavigateTo($"/thing/edit/{Page.ToString()}");
+    }
+}

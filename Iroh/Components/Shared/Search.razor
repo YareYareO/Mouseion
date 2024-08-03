@@ -100,28 +100,15 @@
         {
             userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         }
-        // for displaying things
         await StartSearch();
     }
     private async Task StartSearch()
-    {
+    {   // Service supports when no tag is selected. will just return all things inside the app.
         List<int> chosenTagIds = new List<int>();
-        if(!chosen.All(tag => !tag))
+        if (!chosen.All(tag => !tag))
         {
             Tag[] chosenTags = tags.Where((tag, index) => chosen[index]).ToArray();
             chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
-        }
-        else
-        {
-            Tag standardTag = tags.Where(tag => tag.Name == App.ToString()).ToList()[0];
-            if(standardTag != null)
-            {
-                chosenTagIds.Add(standardTag.Id);
-            }
-            else
-            {
-                chosenTagIds.Add(tags[0].Id);
-            }
         }
         things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: App);
     }

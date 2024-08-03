@@ -1,0 +1,19 @@
+﻿@page "/search/Animal"
+@inject NavigationManager NavigationManager
+@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+
+<PageTitle>Search Animals</PageTitle>
+
+<h3>Search for Animals!</h3>
+
+<button @onclick="@(() => CreateGame())">Create New</button>
+<Iroh.Components.Shared.Search app=@Page />
+
+@code {
+    UsedInApp Page = UsedInApp.Animal;
+    private void CreateGame()
+    {
+        NavigationManager.NavigateTo($"/thing/edit/{Page.ToString()}");
+    }
+}

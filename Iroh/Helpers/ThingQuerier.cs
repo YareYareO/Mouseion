@@ -32,14 +32,17 @@ namespace Iroh.Helpers
         }
         private IQueryable<Thing> GetThingsByTags(IEnumerable<int> tagIds)
         {
-
             var things = _context.Descriptions
                 .Where(description => tagIds.Contains(description.TagId))
                 .GroupBy(description => description.ThingId)
                 .Where(group => group.Count() == tagIds.Count())
                 .Select(group => group.Key);
-            return _context.Things.Where(thing => things.Contains(thing.Id));
-            //return things2.Where(t => t.App == this.app);
+
+            if(tagIds.Count() == 0)
+            {
+                return _context.Things.Where(thing => thing.App == this.app);
+            }
+            return _context.Things.Where(thing => (thing.App == this.app) & things.Contains(thing.Id));
         }
         private IQueryable<Thing> SortThings(IQueryable<Thing> things, string sortBy)
         {
