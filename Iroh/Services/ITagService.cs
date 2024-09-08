@@ -6,6 +6,7 @@ namespace Iroh.Services
     {
         public UsedInApp GetEnumByString(string name);
         public TagFamily[] GetTagFamilies(UsedInApp page);
-        public List<int> GetTagsByThing(int thingId);
+        public List<Tag> GetTagsByThing(int thingId);
+        //public List<int> GetTagNamesByThing(int thingId);
     }
 }

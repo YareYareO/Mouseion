@@ -9,43 +9,52 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @rendermode InteractiveServer
 
-<p>User ID: @userId</p>
-@if(Id is null)
-{   // Page Headline
-    <PageTitle>Create new Thing</PageTitle>
-    <h1>Create new Thing</h1>
-}
-else
-{
-    <PageTitle>Edit @CurrentThing.Name</PageTitle>
-    <h1>Edit @CurrentThing.Name</h1>
-}
-<br/>
-@if (tags != null && chosen != null)
-{   // Display all Tags to choose from
-    @for (int i = 0; i < tags.Count; i++)
-    {
-        var index = i;
-        <label class="btn">
-            <input type="checkbox" @bind-value="chosen[index]" /> @tags[i].Name
-        </label>
-    }
-}
-
-<EditForm Model="CurrentThing" OnSubmit="HandleSubmit">
-    <!--Input for the Thing. Submit button at the end.-->
-    <div>
-        <label for="name">Name</label>
-        <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control"/>
-    </div>
-    <div>
-        <label for="desc">Description</label>
-        <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
-    </div>
+<AuthorizeView>
     
-    <button type="submit" class="btn btn-primary">Submit</button>
+    <Authorized>
+        <p>User ID: @userId</p>
+        @if (Id is null)
+        {   // Page Headline
+            <PageTitle>Create new Thing</PageTitle>
+            <h1>Create new Thing</h1>
+        }
+        else
+        {
+            <PageTitle>Edit @CurrentThing.Name</PageTitle>
+            <h1>Edit @CurrentThing.Name</h1>
+        }
+        <br />
+        @if (tags != null && chosen != null)
+        {   // Display all Tags to choose from
+            @for (int i = 0; i < tags.Count; i++)
+            {
+                var index = i;
+                <label class="btn">
+                    <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
+                </label>
+            }
+        }
+        
+        <EditForm Model="CurrentThing" OnSubmit="HandleSubmit" Context="edit_context">
+            <!--Input for the Thing. Submit button at the end.-->
+            <div>
+                <label for="name">Name</label>
+                <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control" />
+            </div>
+            <div>
+                <label for="desc">Description</label>
+                <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
+            </div>
 
-</EditForm>
+            <button type="submit" class="btn btn-primary">Submit</button>
+
+        </EditForm>
+    </Authorized>
+    <NotAuthorized>
+        <p>How did you get here? LEAVE AT ONCE!</p>
+    </NotAuthorized>
+</AuthorizeView>
+
 
 @code {
     [Parameter]
@@ -69,25 +78,17 @@ else
 
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
-
-        chosen = new bool[tags.Count];
-
         userId = "unknown";
         if (user.Identity != null & user.Identity.IsAuthenticated)
         {
             userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            chosen = new bool[tags.Count];
         }        
-        try
+        if (Id is not null & user.Identity.IsAuthenticated)
         {
-            if (Id is not null)
-            {
-                var thing = await ThingService.FindAsync((int)Id);
-                CurrentThing = thing;
-            }
-        }
-        catch(Exception)
-        {
-            throw;
+            var thing = await ThingService.FindAsync((int)Id);
+            CurrentThing = thing;
+            chosen = GetChosenTags(CurrentThing.Id);
         }
     }
 
@@ -118,5 +119,28 @@ else
         await ThingService.UpdateDescriptions(chosenTagIds, thingId);
         NavigationManager.NavigateTo($"/search/{AppString}");
         return;
+    }
+    bool[] GetChosenTags(int thingid)
+    {
+        bool[] ret = new bool[tags.Count];
+
+        try
+        {
+            List<string> thingsTags = TagService.GetTagsByThing(thingid).Select(t => t.Name).ToList();
+            List<string> tagNames = tags.Select(t => t.Name).ToList();
+
+            for (int i = 0; i < ret.Length; i++)
+            {
+                if (thingsTags.Contains(tagNames[i]))
+                {
+                    ret[i] = true;
+                }
+            }
+        }
+        catch
+        {
+            ret = new bool[tags.Count];
+        }
+        return ret;
     }
 }

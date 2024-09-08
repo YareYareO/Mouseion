@@ -57,18 +57,21 @@
                     <td>@thing.Name</td>
                     <td>@thing.Description</td>
                     <td>@thing.CreatedAt.ToString()</td>
-                    <td>@thing.Upvotes.ToString()</td>
+                    <td>@thing.Upvotes</td>
                     <td>@thing.App.ToString()</td>
                     <td>@thing.Creator.ToString()</td>
-                    <td><button class="btn btn-primary" @onclick="@(() => UpvoteThing(thing.Id, userId))">Vote</button></td>
+                    <AuthorizeView>
+                        <Authorized>
+                            <td><button class="btn btn-primary" @onclick="@(() => UpvoteThing(thing.Id, userId))">Vote</button></td>
+                        </Authorized>
+                    </AuthorizeView>
+                    
 
                 </tr>
             }
         </tbody>
     </table>
 }
-
-
 <!-- Code -->
 
 @code {
@@ -110,10 +113,14 @@
             Tag[] chosenTags = tags.Where((tag, index) => chosen[index]).ToArray();
             chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
         }
+        //TODO: Current page
         things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: App);
     }
     private async void UpvoteThing(int thingid, string userid)
     {
+        var thing = things.FirstOrDefault(t => t.Id == thingid);
+        if (thing == null) return;
+
         // nutze helper der ein bool zurückgibt wenn true, thing.Upvotes++ und erstelle ein Upvote Objekt (in einem Helper)
         bool doesExist = await UpvoteService.DoesUpvoteExistAlready(thingid, userid);
         bool successfullProcess = false;
@@ -123,8 +130,9 @@
         }
         else
         {
-            successfullProcess = await UpvoteService.CreateUpvote(thingid, userid);    
+            successfullProcess = await UpvoteService.CreateUpvote(thingid, userid);
         }
+        StateHasChanged();
         if (successfullProcess)
         {
             // success message

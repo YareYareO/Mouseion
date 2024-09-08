@@ -43,11 +43,18 @@ namespace Iroh.Services
             }
             return new TagFamily[0];
         }
-        public List<int> GetTagsByThing(int thingId)
+        /*public List<int> GetTagsByThing(int thingId)
         {
             List<Description> descriptions = _context.Descriptions.Where(desc => desc.ThingId == thingId).ToList();
             List<int> tagIds = descriptions.Select(d => d.TagId).ToList();
             return tagIds;
+        }*/
+        public List<Tag> GetTagsByThing(int thingId)
+        {
+            List<Description> descriptions = _context.Descriptions.Where(desc => desc.ThingId == thingId).ToList();
+            List<int> tagIds = descriptions.Select(d => d.TagId).ToList();
+            List<Tag> tags = _context.Tags.Where(t => tagIds.Contains(t.Id)).ToList();
+            return tags;
         }
     }
 }

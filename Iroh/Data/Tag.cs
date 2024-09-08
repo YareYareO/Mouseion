@@ -17,5 +17,9 @@ namespace Iroh.Data
         [Column(TypeName = "nvarchar(50)")]
         public string Name { get; set; }
         public TagFamily Family { get; set; }
+        public bool IsSame(Tag other)
+        {
+            return this.Name == other.Name && this.Family == other.Family;
+        }
     }
 }
