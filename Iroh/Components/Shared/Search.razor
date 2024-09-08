@@ -11,14 +11,24 @@
 
 <!-- Tag functionalities -->
 <br />
-@if(tags != null && chosen != null)
+
+@if (tags != null && chosen != null)
 {
-    @for (int i = 0; i < tags.Count; i++)
+    var groupedTags = tags.GroupBy(tag => tag.Family)
+                          .OrderBy(group => group.Key); // Sortiere nach Enum-Wert der Familie
+
+    @foreach (var group in groupedTags)
     {
-        var index = i;
-        <label class="btn">
-            <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
-        </label>
+        <p>@group.Key</p>
+        @for (int i = 0; i < group.Count(); i++)
+        {
+            var tag = group.ElementAt(i);
+            var index = tags.IndexOf(tag);  // Um den richtigen Index von "chosen" zu behalten
+
+            <label class="btn">
+                <input type="checkbox" @bind="chosen[index]" /> @tag.Name
+            </label>
+        }
     }
 }
 <br />
