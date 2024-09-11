@@ -80,6 +80,8 @@
         </tbody>
     </table>
 }
+
+<button @onclick="@(() => ChangePage(1))"> Next Page </button>
 <!-- Code -->
 
 @code {
@@ -90,6 +92,7 @@
     private bool[]? chosen;
     private string[] sortOptions = ["Upvotes", "New"];
     private string? sortBy;
+    private int currentPage;
     // for displaying things
     private List<Thing>? things;
     // for upvote functionalities
@@ -103,6 +106,7 @@
         tags = await SearchThingService.GetTagsByFamilies(families);
         chosen = new bool[tags.Count];
         sortBy = sortOptions[0];
+        currentPage = 1;
         // for upvote functionalities
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
@@ -122,9 +126,9 @@
             chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
         }
         //TODO: Current page
-        things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: App);
+        things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: App, currentPage: currentPage);
     }
-    private async void UpvoteThing(int thingid, string userid)
+    private async Task UpvoteThing(int thingid, string userid)
     {
         var thing = things.FirstOrDefault(t => t.Id == thingid);
         if (thing == null) return;
@@ -140,7 +144,7 @@
         {
             successfullProcess = await UpvoteService.CreateUpvote(thingid, userid);
         }
-        StateHasChanged();
+        //StateHasChanged();
         if (successfullProcess)
         {
             // success message
@@ -151,5 +155,11 @@
             // no success message
             Console.WriteLine("Upvote process not successfull");
         }
+    }
+    private async Task ChangePage(int changerate)
+    {
+        this.currentPage += changerate;
+        await StartSearch();
+        //StateHasChanged();
     }
 }

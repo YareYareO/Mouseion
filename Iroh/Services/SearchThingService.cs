@@ -16,9 +16,9 @@ namespace Iroh.Services
             return tags;
         }
 
-        public async Task<List<Thing>> GetThingsByTags(List<int> tags, string sortBy, UsedInApp app)
+        public async Task<List<Thing>> GetThingsByTags(List<int> tags, string sortBy, UsedInApp app, int currentPage)
         {
-            ThingQuerier querier = new ThingQuerier(context: _context, chosentags: tags, currentPage: 1, sortBy: sortBy, app: app);
+            ThingQuerier querier = new ThingQuerier(context: _context, chosentags: tags, currentPage: currentPage, sortBy: sortBy, app: app);
             var things = await querier.GetSortedThings().ToListAsync();
             return things;
         }
