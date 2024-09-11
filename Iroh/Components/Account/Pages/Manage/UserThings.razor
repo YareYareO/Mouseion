@@ -20,9 +20,7 @@ else
             <tr>
                 <th>Name</th>
                 <th>Description</th>
-                <th>CreatedAt</th>
                 <th>Upvotes</th>
-                <th>App</th>
                 <th>Edit</th>
             </tr>
         </thead>
@@ -32,10 +30,7 @@ else
                 <tr>
                     <td>@thing.Name</td>
                     <td>@thing.Description</td>
-                    <td>@thing.CreatedAt.ToString()</td>
                     <td>@thing.Upvotes.ToString()</td>
-                    <td>@thing.App.ToString()</td>
-                    <td>@thing.Creator.ToString()</td>
                     <td><button class="btn btn-primary" @onclick="@(() => EditThing(thing.Id, thing.App))">Edit</button></td>
                 </tr>
             }

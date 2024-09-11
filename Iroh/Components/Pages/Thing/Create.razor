@@ -12,43 +12,51 @@
 <AuthorizeView>
     
     <Authorized>
-        <p>User ID: @userId</p>
-        @if (Id is null)
-        {   // Page Headline
-            <PageTitle>Create new Thing</PageTitle>
-            <h1>Create new Thing</h1>
-        }
-        else
+        @if (Id != null && userId == CurrentThing.Creator || Id == null)
         {
-            <PageTitle>Edit @CurrentThing.Name</PageTitle>
-            <h1>Edit @CurrentThing.Name</h1>
-        }
-        <br />
-        @if (tags != null && chosen != null)
-        {   // Display all Tags to choose from
-            @for (int i = 0; i < tags.Count; i++)
-            {
-                var index = i;
-                <label class="btn">
-                    <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
-                </label>
+            <p>User ID: @userId</p>
+            @if (Id is null)
+            {   // Page Headline
+                <PageTitle>Create new Thing</PageTitle>
+                <h1>Create new Thing</h1>
             }
+            else
+            {
+                <PageTitle>Edit @CurrentThing.Name</PageTitle>
+                <h1>Edit @CurrentThing.Name</h1>
+            }
+            <br />
+            @if (tags != null && chosen != null)
+            {   // Display all Tags to choose from
+                @for (int i = 0; i < tags.Count; i++)
+                {
+                    var index = i;
+                    <label class="btn">
+                        <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
+                    </label>
+                }
+            }
+
+            <EditForm Model="CurrentThing" OnSubmit="HandleSubmit" Context="edit_context">
+                <!--Input for the Thing. Submit button at the end.-->
+                <div>
+                    <label for="name">Name</label>
+                    <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control" />
+                </div>
+                <div>
+                    <label for="desc">Description</label>
+                    <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
+                </div>
+
+                <button type="submit" class="btn btn-primary">Submit</button>
+
+            </EditForm>
         }
-        
-        <EditForm Model="CurrentThing" OnSubmit="HandleSubmit" Context="edit_context">
-            <!--Input for the Thing. Submit button at the end.-->
-            <div>
-                <label for="name">Name</label>
-                <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control" />
-            </div>
-            <div>
-                <label for="desc">Description</label>
-                <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
-            </div>
+        else 
+        {
+            <p>You are trying to edit somebody else's thing!</p>
+        }
 
-            <button type="submit" class="btn btn-primary">Submit</button>
-
-        </EditForm>
     </Authorized>
     <NotAuthorized>
         <p>How did you get here? LEAVE AT ONCE!</p>
