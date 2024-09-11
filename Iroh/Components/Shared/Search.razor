@@ -80,7 +80,8 @@
         </tbody>
     </table>
 }
-
+<button @onclick="@(() => ChangePage(-1))"> Previous Page </button>
+<label>@currentPage</label>
 <button @onclick="@(() => ChangePage(1))"> Next Page </button>
 <!-- Code -->
 
@@ -117,7 +118,7 @@
         }
         await StartSearch();
     }
-    private async Task StartSearch()
+    private async Task<bool> StartSearch()
     {   // Service supports when no tag is selected. will just return all things inside the app.
         List<int> chosenTagIds = new List<int>();
         if (!chosen.All(tag => !tag))
@@ -126,7 +127,13 @@
             chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
         }
         //TODO: Current page
-        things = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: App, currentPage: currentPage);
+        List<Thing> foundthings = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: App, currentPage: currentPage);
+        if (foundthings.Count > 0)
+        {
+            things = foundthings;
+            return true;
+        }
+        return false;
     }
     private async Task UpvoteThing(int thingid, string userid)
     {
@@ -144,22 +151,18 @@
         {
             successfullProcess = await UpvoteService.CreateUpvote(thingid, userid);
         }
-        //StateHasChanged();
-        if (successfullProcess)
-        {
-            // success message
-            Console.WriteLine("Upvote process successfull");
-        }
-        else 
-        { 
-            // no success message
-            Console.WriteLine("Upvote process not successfull");
-        }
     }
     private async Task ChangePage(int changerate)
     {
         this.currentPage += changerate;
-        await StartSearch();
-        //StateHasChanged();
+        if(this.currentPage < 1)
+        {
+            this.currentPage = 1;
+        }
+        bool isNextPageEmpty = !(await StartSearch());
+        if(isNextPageEmpty)
+        {
+            this.currentPage -= changerate;
+        }
     }
 }
