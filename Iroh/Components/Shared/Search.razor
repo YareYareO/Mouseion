@@ -53,11 +53,13 @@
             <tr>
                 <th>Name</th>
                 <th>Description</th>
-                <th>CreatedAt</th>
                 <th>Upvotes</th>
-                <th>App</th>
-                <th>Creator</th>
-                <th>Upvote</th>
+                <AuthorizeView>
+                    <Authorized>
+                        <th>Upvote</th>
+                    </Authorized>
+                </AuthorizeView>
+                
             </tr>
         </thead>
         <tbody>
@@ -66,10 +68,7 @@
                 <tr>
                     <td>@thing.Name</td>
                     <td>@thing.Description</td>
-                    <td>@thing.CreatedAt.ToString()</td>
                     <td>@thing.Upvotes</td>
-                    <td>@thing.App.ToString()</td>
-                    <td>@thing.Creator.ToString()</td>
                     <AuthorizeView>
                         <Authorized>
                             <td><button class="btn btn-primary" @onclick="@(() => UpvoteThing(thing.Id, userId))">Vote</button></td>
@@ -83,6 +82,12 @@
 <button @onclick="@(() => ChangePage(-1))"> Previous Page </button>
 <label>@currentPage</label>
 <button @onclick="@(() => ChangePage(1))"> Next Page </button>
+@if (isPopupVisible)
+{
+    <div class="popup">
+        <p>Found nothing!</p>
+    </div>
+}
 <!-- Code -->
 
 @code {
@@ -94,6 +99,7 @@
     private string[] sortOptions = ["Upvotes", "New"];
     private string? sortBy;
     private int currentPage;
+    private bool isPopupVisible;
     // for displaying things
     private List<Thing>? things;
     // for upvote functionalities
@@ -108,6 +114,7 @@
         chosen = new bool[tags.Count];
         sortBy = sortOptions[0];
         currentPage = 1;
+        isPopupVisible = false;
         // for upvote functionalities
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
         var user = authState.User;
@@ -163,6 +170,15 @@
         if(isNextPageEmpty)
         {
             this.currentPage -= changerate;
+            await ShowPopup();
         }
+    }
+    private async Task ShowPopup()
+    {
+        isPopupVisible = true;
+        StateHasChanged(); // UI sofort aktualisieren
+        await Task.Delay(3000); // 3 Sekunden warten
+        isPopupVisible = false;
+        StateHasChanged(); // Popup ausblenden
     }
 }
