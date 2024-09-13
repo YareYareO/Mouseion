@@ -6,8 +6,8 @@
 <PageTitle>Search Writings</PageTitle>
 
 <h3>Search for Writings!</h3>
-<button @onclick="@(() => CreateGame())">Create New</button>
 
+<button class="btn btn-primary" @onclick="@(() => CreateGame())">Create New</button>
 <Iroh.Components.Shared.Search app=@Page/>
 
 @code {
