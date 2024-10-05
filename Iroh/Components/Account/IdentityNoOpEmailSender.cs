@@ -1,6 +1,8 @@
 using Iroh.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Iroh.Services;
+using Microsoft.Extensions.Options;
 
 namespace Iroh.Components.Account
 {

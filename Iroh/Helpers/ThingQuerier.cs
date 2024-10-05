@@ -21,7 +21,7 @@ namespace Iroh.Helpers
             this.sortBy = sortBy;
 
             skipItems = 0;
-            itemsPerPage = 2;
+            itemsPerPage = 20;
         }
 
         public IQueryable<Thing> GetSortedThings()

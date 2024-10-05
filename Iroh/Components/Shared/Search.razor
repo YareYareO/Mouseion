@@ -10,8 +10,6 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <!-- Tag functionalities -->
-<br />
-
 @if (tags != null && chosen != null)
 {
     var groupedTags = tags.GroupBy(tag => tag.Family)
@@ -19,59 +17,69 @@
 
     @foreach (var group in groupedTags)
     {
-        <p>@group.Key</p>
-        @for (int i = 0; i < group.Count(); i++)
-        {
-            var tag = group.ElementAt(i);
-            var index = tags.IndexOf(tag);  // Um den richtigen Index von "chosen" zu behalten
+        <div role="group" aria-label="checkboxgroup">
+            <label class="fw-bold fs-5 mt-0 ms-1">@group.Key</label>
 
-            <label class="btn">
-                <input type="checkbox" @bind="chosen[index]" /> @tag.Name
-            </label>
-        }
+            @for (int i = 0; i < group.Count(); i++)
+            {
+                var tag = group.ElementAt(i);
+                var index = tags.IndexOf(tag);  // Um den richtigen Index von "chosen" zu behalten
+
+                string btnid = "btncheck" + tag.Name;
+                <input type="checkbox" class="btn-check" id="@btnid" autocomplete="off" @bind="chosen[index]">
+                <label class="btn btn-outline-primary ms-1 mt-1" for="@btnid">@tag.Name</label>
+            }
+        </div>
     }
 }
 <br />
+<!-- Sorting -->
 <InputRadioGroup @bind-Value="sortBy">
-    <label class="btn">
-        <InputRadio Value="@sortOptions[0]"/> @sortOptions[0]
-    </label>
-    <label class="btn">
-        <InputRadio Value="@sortOptions[1]"/> @sortOptions[1]
-    </label>
-</InputRadioGroup>
-<button @onclick="@(() => StartSearch())">Search</button>
+    <div class="form-check form-check-inline ms-2">
+        <InputRadio Value="@sortOptions[0]" class="form-check-input" id="SortByUpvotes"/> 
+        <label class="form-check-label" for="SortByUpvotes">@sortOptions[0]</label>
+    </div>
 
+    <div class="form-check form-check-inline">
+        <InputRadio Value="@sortOptions[1]" class="form-check-input" id="SortByNew" />
+        <label class="form-check-label" for="SortByNew">@sortOptions[1]</label>
+    </div>
+</InputRadioGroup>
+<button class="btn btn-primary" @onclick="@(() => SearchButtonPressed())">Search</button>
+@if (isPopupVisible)
+{
+    <label class="ms-3">Found nothing!</label>
+}
 <!-- Displaying Things-->
 @if (things == null)
 {
     <p><em>Loading...</em></p>
 }else
 {
-    <table class="table">
+    <table class="table table-striped table-bordered m-2">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th>Upvotes</th>
+                <th scope="col">Name</th>
+                <th scope="col">Description</th>
+                <th scope="col">Upvotes</th>
                 <AuthorizeView>
                     <Authorized>
-                        <th>Upvote</th>
+                        <th scope="col">Upvote</th>
                     </Authorized>
                 </AuthorizeView>
                 
             </tr>
         </thead>
-        <tbody>
+        <tbody class="table-group-divider">
             @foreach (var thing in things)
             {
                 <tr>
-                    <td>@thing.Name</td>
-                    <td>@thing.Description</td>
-                    <td>@thing.Upvotes</td>
+                    <td scope="col">@thing.Name</td>
+                    <td scope="col">@thing.Description</td>
+                    <td scope="col">@thing.Upvotes</td>
                     <AuthorizeView>
                         <Authorized>
-                            <td><button class="btn btn-primary" @onclick="@(() => UpvoteThing(thing.Id, userId))">Vote</button></td>
+                            <td><button class="btn btn-info" @onclick="@(() => UpvoteThing(thing.Id, userId))">Vote</button></td>
                         </Authorized>
                     </AuthorizeView>
                 </tr>
@@ -79,15 +87,22 @@
         </tbody>
     </table>
 }
-<button @onclick="@(() => ChangePage(-1))"> Previous Page </button>
-<label>@currentPage</label>
-<button @onclick="@(() => ChangePage(1))"> Next Page </button>
-@if (isPopupVisible)
-{
-    <div class="popup">
-        <p>Found nothing!</p>
-    </div>
-}
+<nav class="m-2" aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item">
+            <button class="page-link" @onclick="@(() => ChangePage(-1))">
+                <span aria-hidden="true">&laquo;</span>
+            </button>
+        </li>
+        <li class="page-item"><label class="page-link">@currentPage</label></li>
+        <li class="page-item">
+            <button class="page-link" @onclick="@(() => ChangePage(1))">
+                <span aria-hidden="true">&raquo;</span>
+            </button>
+        </li>
+    </ul>
+</nav>
+
 <!-- Code -->
 
 @code {
@@ -125,6 +140,12 @@
         }
         await StartSearch();
     }
+    private async Task SearchButtonPressed()
+    {
+        this.currentPage = 1;
+        await StartSearch();
+    }
+    <!-- MACH EINE VOR-METHODE FÜR STARTSEARCH WENN DER SEARCHBUTTON GEDRÜCKT WIRD UM CURRENTPAGE AUF 1 ZU SETTEN. -->
     private async Task<bool> StartSearch()
     {   // Service supports when no tag is selected. will just return all things inside the app.
         List<int> chosenTagIds = new List<int>();
@@ -140,6 +161,7 @@
             things = foundthings;
             return true;
         }
+        ShowPopup();
         return false;
     }
     private async Task UpvoteThing(int thingid, string userid)
@@ -170,14 +192,13 @@
         if(isNextPageEmpty)
         {
             this.currentPage -= changerate;
-            await ShowPopup();
         }
     }
-    private async Task ShowPopup()
+    private async void ShowPopup()
     {
         isPopupVisible = true;
         StateHasChanged(); // UI sofort aktualisieren
-        await Task.Delay(3000); // 3 Sekunden warten
+        await Task.Delay(2000); // 3 Sekunden warten
         isPopupVisible = false;
         StateHasChanged(); // Popup ausblenden
     }
