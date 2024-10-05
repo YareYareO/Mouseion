@@ -17,14 +17,15 @@ namespace Iroh.Data
             Creator = String.Empty;
         }
         public int Id { get; set; }
-        [Column(TypeName = "nvarchar(100)")]
+        [Column(TypeName = "varchar(100)")]
         public string Name { get; set; }
-        [Column(TypeName = "nvarchar(400)")]
+        [Column(TypeName = "varchar(512)")]
         public string Description { get; set; }
+        [Column(TypeName = "timestamp")]
         public DateTime CreatedAt { get; set; }
         public UsedInApp App { get; set; }
         public int Upvotes { get; set; } = 0;
-        [Column(TypeName = "nvarchar(450)")]
+        [Column(TypeName = "varchar(450)")]
         public string Creator { get; set; }
 
     }

@@ -14,7 +14,7 @@ namespace Iroh.Data
             Name = name;
         }
         public int Id { get; set; }
-        [Column(TypeName = "nvarchar(50)")]
+        [Column(TypeName = "varchar(50)")]
         public string Name { get; set; }
         public TagFamily Family { get; set; }
         public bool IsSame(Tag other)
