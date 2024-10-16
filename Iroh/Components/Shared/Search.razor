@@ -1,11 +1,7 @@
 ﻿@inject ISearchThingService SearchThingService
 @inject ITagService TagService
-@inject IUpvoteService UpvoteService
 @inject NavigationManager NavigationManager
 @using System.Linq
-@using Microsoft.AspNetCore.Components.Authorization
-@using System.Security.Claims
-@inject AuthenticationStateProvider AuthenticationStateProvider
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
@@ -50,43 +46,17 @@
 {
     <label class="ms-3">Found nothing!</label>
 }
-<!-- Displaying Things-->
-@if (things == null)
+<!-- Displaying Things -->
+@if(true)
 {
-    <p><em>Loading...</em></p>
-}else
+    <Iroh.Components.Shared.ThingBook Things=@things />
+} else
 {
-    <table class="table table-striped table-bordered m-2">
-        <thead>
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Description</th>
-                <th scope="col">Upvotes</th>
-                <AuthorizeView>
-                    <Authorized>
-                        <th scope="col">Upvote</th>
-                    </Authorized>
-                </AuthorizeView>
-                
-            </tr>
-        </thead>
-        <tbody class="table-group-divider">
-            @foreach (var thing in things)
-            {
-                <tr>
-                    <td scope="col">@thing.Name</td>
-                    <td scope="col">@thing.Description</td>
-                    <td scope="col">@thing.Upvotes</td>
-                    <AuthorizeView>
-                        <Authorized>
-                            <td><button class="btn btn-info" @onclick="@(() => UpvoteThing(thing.Id, userId))">Vote</button></td>
-                        </Authorized>
-                    </AuthorizeView>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <Iroh.Components.Shared.ThingTable Things=@things />
 }
+
+
+<!-- Pagination-->
 <nav class="m-2" aria-label="Page navigation example">
     <ul class="pagination">
         <li class="page-item">
@@ -102,8 +72,6 @@
         </li>
     </ul>
 </nav>
-<Iroh.Components.Shared.Book Things=@things />
-<!-- Code -->
 
 @code {
     [Parameter]
@@ -117,9 +85,6 @@
     private bool isPopupVisible;
     // for displaying things
     private List<Thing>? things;
-    // for upvote functionalities
-    private string userId;
-
 
     protected override async Task OnInitializedAsync()
     {
@@ -130,14 +95,7 @@
         sortBy = sortOptions[0];
         currentPage = 1;
         isPopupVisible = false;
-        // for upvote functionalities
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        userId = "unknown";
-        if (user.Identity != null & user.Identity.IsAuthenticated)
-        {
-            userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        }
+       
         await StartSearch();
     }
     private async Task SearchButtonPressed()
@@ -145,7 +103,6 @@
         this.currentPage = 1;
         await StartSearch();
     }
-    <!-- MACH EINE VOR-METHODE FÜR STARTSEARCH WENN DER SEARCHBUTTON GEDRÜCKT WIRD UM CURRENTPAGE AUF 1 ZU SETTEN. -->
     private async Task<bool> StartSearch()
     {   // Service supports when no tag is selected. will just return all things inside the app.
         List<int> chosenTagIds = new List<int>();
@@ -164,23 +121,7 @@
         ShowPopup();
         return false;
     }
-    private async Task UpvoteThing(int thingid, string userid)
-    {
-        var thing = things.FirstOrDefault(t => t.Id == thingid);
-        if (thing == null) return;
 
-        // nutze helper der ein bool zurückgibt wenn true, thing.Upvotes++ und erstelle ein Upvote Objekt (in einem Helper)
-        bool doesExist = await UpvoteService.DoesUpvoteExistAlready(thingid, userid);
-        bool successfullProcess = false;
-        if (doesExist)
-        {
-            successfullProcess = await UpvoteService.RemoveUpvote(thingid, userid);
-        }
-        else
-        {
-            successfullProcess = await UpvoteService.CreateUpvote(thingid, userid);
-        }
-    }
     private async Task ChangePage(int changerate)
     {
         this.currentPage += changerate;

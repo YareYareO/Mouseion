@@ -16,8 +16,8 @@
     perspective: 1500;
 }
 
-input {
-    display: flow;
+.bookcheckbox {
+    display: none;
 }
 
 .cover, .back-cover {
