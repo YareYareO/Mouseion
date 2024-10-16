@@ -1,0 +1,53 @@
+﻿@rendermode @(new InteractiveServerRenderMode(prerender: false))
+
+<script src="../Components/Shared/Book.razor.js"></script>
+<h3>Book</h3>
+<button onclick="onThingsChanged()">Hi</button>
+<div class="bookstand">
+    <input type="checkbox" id="checkbox-cover" class="bookcheckbox">
+    
+    <div class="book">
+        <div class="cover">
+            <label for="checkbox-cover"></label>
+        </div>
+
+        @if(Things != null)
+        {
+            @for (int i = 0; i < Things.Count(); i++)
+            {
+                string checkboxid = "checkbox-page" + i;
+
+                <div class="page" data-page-number="@i">
+                    <input type="checkbox" class="bookcheckbox" id="@checkboxid" data-check-number="@i">
+                    <label for="@checkboxid" class="front-page next">
+                        <div class="front-page">
+                            <h2>@Things[i].Name</h2>
+                            <p>@Things[i].Description</p>
+                        </div>
+                    </label>
+                    <label for="@checkboxid" class="back-page prev">
+                        <div>
+                        </div>
+                    </label>
+                </div>
+            }   
+        }
+        
+        <div class="back-cover "></div>
+    </div>
+</div>
+@code {
+    [Parameter]
+    public List<Thing> Things { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Things = new List<Thing>
+        {
+            new Thing(name: "A", description: "AAAAAAAAAAAAAA", UsedInApp.Person),
+            new Thing(name: "B", description: "BBBBBBBBBBBBBB", UsedInApp.Person),
+            new Thing(name: "C", description: "CCCCCCCCCCCCCC", UsedInApp.Person),
+            new Thing(name: "D", description: "DDDDDDDDDDDDDD", UsedInApp.Person),
+        };
+    }
+}
