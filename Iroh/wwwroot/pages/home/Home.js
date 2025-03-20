@@ -1,7 +1,10 @@
-﻿const draggable = document.getElementById('draggable');
+const draggable = document.getElementById('draggable');
 let isDragging = false;
 let startX, startY, currentRotation = 0;
 console.log("hi");
+
+
+
 function startDrag(event) {
     isDragging = true;
     // Capture the starting position
@@ -45,3 +48,4 @@ draggable.addEventListener('touchstart', startDrag);
 draggable.addEventListener('touchmove', onDrag);
 draggable.addEventListener('touchend', endDrag);
 draggable.addEventListener('touchcancel', endDrag);
+
