@@ -1,107 +1,73 @@
 ﻿@page "/thing/edit/{AppString}"
-@page "/thing/edit/{AppString}/{Id:int}"
 @inject IThingService ThingService
 @inject NavigationManager NavigationManager
 @inject ISearchThingService SearchThingService
 @inject ITagService TagService
-@using Microsoft.AspNetCore.Components.Authorization
-@using System.Security.Claims
-@inject AuthenticationStateProvider AuthenticationStateProvider
 @rendermode InteractiveServer
 
-<AuthorizeView>
-    
-    <Authorized>
-        @if (Id != null && userId == CurrentThing.Creator || Id == null)
-        {
-            <p>User ID: @userId</p>
-            @if (Id is null)
-            {   // Page Headline
-                <PageTitle>Create new Thing</PageTitle>
-                <h1>Create new Thing</h1>
-            }
-            else
+<PageTitle>Create new Thing</PageTitle>
+
+<form class="terminal-form">
+    <fieldset>
+        <legend>Create new @App.ToString()</legend>
+        @if (tags != null && chosen != null)
+        {   // Display all Tags to choose from
+            @for (int i = 0; i < tags.Count; i++)
             {
-                <PageTitle>Edit @CurrentThing.Name</PageTitle>
-                <h1>Edit @CurrentThing.Name</h1>
+                var index = i;
+                <label class="btn">
+                    <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
+                </label>
             }
-            <br />
-            @if (tags != null && chosen != null)
-            {   // Display all Tags to choose from
-                @for (int i = 0; i < tags.Count; i++)
-                {
-                    var index = i;
-                    <label class="btn">
-                        <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
-                    </label>
-                }
-            }
+        }
 
-            <EditForm Model="CurrentThing" OnSubmit="HandleSubmit" Context="edit_context">
-                <!--Input for the Thing. Submit button at the end.-->
-                <div>
-                    <label for="name">Name</label>
-                    <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control" />
-                </div>
-                <div>
-                    <label for="desc">Description</label>
-                    <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
-                </div>
-
+        <EditForm Model="CurrentThing" OnSubmit="HandleSubmit" Context="edit_context">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="desc">Description</label>
+                <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
+            </div>
+            <div class="form-group">
                 <button type="submit" class="btn btn-primary">Submit</button>
+            </div>    
+        </EditForm>
 
-            </EditForm>
-        }
-        else 
-        {
-            <p>You are trying to edit somebody else's thing!</p>
-        }
-
-    </Authorized>
-    <NotAuthorized>
-        <p>How did you get here? LEAVE AT ONCE!</p>
-    </NotAuthorized>
-</AuthorizeView>
-
+    </fieldset>
+</form>
 
 @code {
     [Parameter]
-    public int? Id { get; set; }
-    [Parameter]
-    public string AppString { get; set; }
+    public string? AppString { get; set; }
 
     public Thing CurrentThing { get; set; } = new();
-    private List<Tag>? tags;
-    private bool[]? chosen;
-    private string userId;
-    private UsedInApp App;
+    private List<Tag> tags = new List<Tag>(0);
+    private bool[] chosen = new bool[0];
+    private Subject App;
 
 
     protected override async Task OnInitializedAsync()
     {
-        App = TagService.GetEnumByString(AppString);
+        if(AppString != null)
+        {
+            App = TagService.GetEnumByString(AppString);    
+        }
 
         TagFamily[] families = TagService.GetTagFamilies(App);
         tags = await SearchThingService.GetTagsByFamilies(families);
 
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        userId = "unknown";
-        if (user.Identity != null & user.Identity.IsAuthenticated)
-        {
-            userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-            chosen = new bool[tags.Count];
-        }        
-        if (Id is not null & user.Identity.IsAuthenticated)
-        {
-            var thing = await ThingService.FindAsync((int)Id);
-            CurrentThing = thing;
-            chosen = GetChosenTags(CurrentThing.Id);
-        }
+        chosen = new bool[tags.Count];
+        
     }
 
     async Task HandleSubmit()
     {
+        if(tags.Count() == 0)
+        {
+            return;
+        }
         //Prepare List of tag ids to make descriptions
         List<int> chosenTagIds = new List<int>();
         for(int i = 0; i < chosen.Length; i++)
@@ -111,16 +77,8 @@
                 chosenTagIds.Add(tags[i].Id);
             }
         }
-        CurrentThing.Creator = userId;
+        CurrentThing.Creator = "me lol";
         CurrentThing.App = App;
-        // Update
-        if(Id is not null)
-        {
-            await ThingService.UpdateAsync(CurrentThing, (int)Id);
-            await ThingService.UpdateDescriptions(chosenTagIds, (int)Id);
-            NavigationManager.NavigateTo($"/Account/Manage/UserThings");
-            return;
-        }
         // Create New
         CurrentThing.Upvotes = 0;
         int thingId = await ThingService.CreateAsync(CurrentThing);

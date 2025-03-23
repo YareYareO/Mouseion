@@ -1,48 +1,70 @@
-﻿using Iroh.Data;
-
+﻿using System.Diagnostics;
+using Iroh.Data;
 
 namespace Iroh.Helpers
 {
     public class ThingQuerier
     {
         private readonly ApplicationDbContext _context;
-        private UsedInApp app;
-        private List<int> chosentags;
+        private Subject subject;
+        private List<int>? chosentags;
         private int currentPage;
         private string sortBy;
         private int skipItems;
         private int itemsPerPage;
-        public ThingQuerier(ApplicationDbContext context, List<int> chosentags, int currentPage, string sortBy, UsedInApp app)
+        
+        public ThingQuerier(ApplicationDbContext context, List<int> chosentags, int currentPage, string sortBy, Subject subject)
         {
             _context = context;
-            this.app = app;
+            this.subject = subject;
             this.chosentags = chosentags;
             this.currentPage = currentPage;
             this.sortBy = sortBy;
 
             skipItems = 0;
             itemsPerPage = 20;
+            
+        }
+        public ThingQuerier(ApplicationDbContext context, int currentPage, string sortBy, Subject subject)
+        {
+            _context = context;
+            this.subject = subject;
+            this.currentPage = currentPage;
+            this.sortBy = sortBy;
+            this.chosentags = null;
+            skipItems = 0;
+            itemsPerPage = 20;
+            
         }
 
         public IQueryable<Thing> GetSortedThings()
         {
-            skipItems = (this.currentPage - 1) * this.itemsPerPage;
-            IQueryable<Thing> query = SortThings(GetThingsByTags(this.chosentags), this.sortBy);
+            this.skipItems = (this.currentPage - 1) * this.itemsPerPage;
+            IQueryable<Thing> query;
+            if (this.chosentags == null)
+            {
+                query = SortByNew(GetThingsNoTags());
+            }else{
+                query = SortByNew(GetThingsByTags(this.chosentags));
+            }
             return query;
+        }
+        private IQueryable<Thing> GetThingsNoTags()
+        {
+            Debug.Assert(_context.Things != null);
+            return _context.Things.Where(thing => thing.App == this.subject);
         }
         private IQueryable<Thing> GetThingsByTags(IEnumerable<int> tagIds)
         {
+            Debug.Assert(_context.Things != null);
+            Debug.Assert(_context.Descriptions != null);
             var things = _context.Descriptions
                 .Where(description => tagIds.Contains(description.TagId))
                 .GroupBy(description => description.ThingId)
                 .Where(group => group.Count() == tagIds.Count())
                 .Select(group => group.Key);
 
-            if(tagIds.Count() == 0)
-            {
-                return _context.Things.Where(thing => thing.App == this.app);
-            }
-            return _context.Things.Where(thing => (thing.App == this.app) & things.Contains(thing.Id));
+            return _context.Things.Where(thing => (thing.App == this.subject) & things.Contains(thing.Id));
         }
         private IQueryable<Thing> SortThings(IQueryable<Thing> things, string sortBy)
         {
@@ -62,8 +84,8 @@ namespace Iroh.Helpers
         {
             return things.OrderByDescending(t => t.CreatedAt)
                                                 .Select(t => t)
-                                                .Skip(skipItems)
-                                                .Take(itemsPerPage);
+                                                .Skip(this.skipItems)
+                                                .Take(this.itemsPerPage);
         }
         private IQueryable<Thing> SortByUpvotes(IQueryable<Thing> things)
         {

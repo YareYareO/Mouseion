@@ -1,7 +1,4 @@
-﻿@inject IUpvoteService UpvoteService
-@using Microsoft.AspNetCore.Components.Authorization
-@using System.Security.Claims
-@inject AuthenticationStateProvider AuthenticationStateProvider
+﻿
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
@@ -11,32 +8,32 @@
 }
 else
 {
-    <table class="table table-striped table-bordered m-2">
+    <table class="dark-table">
         <thead>
             <tr>
                 <th scope="col">Name</th>
                 <th scope="col">Description</th>
-                <th scope="col">Upvotes</th>
+                @* <th scope="col">Upvotes</th>
                 <AuthorizeView>
                     <Authorized>
                         <th scope="col">Upvote</th>
                     </Authorized>
-                </AuthorizeView>
+                </AuthorizeView> *@
 
             </tr>
         </thead>
-        <tbody class="table-group-divider">
+        <tbody class="">
             @foreach (var thing in Things)
             {
                 <tr>
                     <td scope="col">@thing.Name</td>
                     <td scope="col">@thing.Description</td>
-                    <td scope="col">@thing.Upvotes</td>
-                    <AuthorizeView>
+                    @*<td scope="col">@thing.Upvotes</td>
+                     <AuthorizeView>
                         <Authorized>
                             <td><button class="btn btn-info" @onclick="@(() => UpvoteThing(thing.Id, userId))">Vote</button></td>
                         </Authorized>
-                    </AuthorizeView>
+                    </AuthorizeView> *@
                 </tr>
             }
         </tbody>
@@ -46,29 +43,10 @@ else
 @code {
     // for displaying things
     [Parameter]
-    public List<Thing> Things { get; set; }
+    public List<Thing> ?Things { get; set; }
     // for upvote functionalities
-    private string userId;
 
-    protected override async Task OnInitializedAsync()
-    {
-        Things = new List<Thing>
-        {
-            new Thing(name: "A", description: "AAAAAAAAAAAAAA", UsedInApp.Person),
-            new Thing(name: "B", description: "BBBBBBBBBBBBBB", UsedInApp.Person),
-            new Thing(name: "C", description: "CCCCCCCCCCCCCC", UsedInApp.Person),
-            new Thing(name: "D", description: "DDDDDDDDDDDDDD", UsedInApp.Person),
-        };
-        // for upvote functionalities
-        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        var user = authState.User;
-        userId = "unknown";
-        if (user.Identity != null & user.Identity.IsAuthenticated)
-        {
-            userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        }
-    }
-    private async Task UpvoteThing(int thingid, string userid)
+    @* private async Task UpvoteThing(int thingid, string userid)
     {
         var thing = Things.FirstOrDefault(t => t.Id == thingid);
         if (thing == null) return;
@@ -84,5 +62,5 @@ else
         {
             successfullProcess = await UpvoteService.CreateUpvote(thingid, userid);
         }
-    }
+    } *@
 }

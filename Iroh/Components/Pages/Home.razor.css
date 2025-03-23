@@ -1,6 +1,12 @@
-﻿*{
+﻿/* *{
     color: black;
 }
+.navigator {
+    position: absolute;
+    width: 100%;
+
+}
+
 .wheelcontainer {
     position: relative;
     width: 1000px;
@@ -38,7 +44,7 @@
     justify-content: center;
     align-items: center;
     z-index: 11;
-    background-image: url("../../pictures/bibtower.png");
+    background-image: url("../../pictures/earth.jpg");
     background-position: right;
     background-repeat: no-repeat;
     background-size: cover;
@@ -57,7 +63,7 @@
 
 .pages a {
     position: absolute;
-    transform: rotate(calc(45deg * var(--i))) translate(0, -420px); /* Adjust -300px to move outward */
+    transform: rotate(calc(45deg * var(--i))) translate(0, -420px); /* Adjust -300px to move outward 
     text-align: center;
     font-size: 2em;
     font-weight: 500;
@@ -71,3 +77,24 @@
     height: 18%;
     width: 25%;
 }
+
+.description {
+    width: 100%;
+    background-color: black;
+    height: 400px;
+    color: white;
+    bottom: 0;
+    position:relative;
+    z-index: 9999999999;
+    margin-top: 550px;
+}
+
+.stories {
+    width: 100%;
+    background-color: white;
+    height: 400px;
+    color: black;
+    bottom: 0;
+    position: relative;
+    z-index: 9999999999;
+} */

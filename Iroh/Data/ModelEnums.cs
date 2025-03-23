@@ -1,6 +1,6 @@
 ﻿namespace Iroh.Data
 {
-    public enum UsedInApp
+    public enum Subject
     {
        Art = 0,
        Place = 1,

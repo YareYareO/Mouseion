@@ -4,8 +4,8 @@ namespace Iroh.Services
 {
     public interface ITagService
     {
-        public UsedInApp GetEnumByString(string name);
-        public TagFamily[] GetTagFamilies(UsedInApp page);
+        public Subject GetEnumByString(string name);
+        public TagFamily[] GetTagFamilies(Subject page);
         public List<Tag> GetTagsByThing(int thingId);
         //public List<int> GetTagNamesByThing(int thingId);
     }

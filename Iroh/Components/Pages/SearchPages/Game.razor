@@ -8,10 +8,10 @@
 <h3>Search for Games!</h3>
 
 <button class="btn btn-primary" @onclick="@(() => CreateGame())">Create New</button>
-<Iroh.Components.Shared.Search app=@Page />
+<Iroh.Components.Shared.Search subject=@Page />
 
 @code {
-    UsedInApp Page = UsedInApp.Game;
+    Subject Page = Subject.Game;
     private void CreateGame()
     {
         NavigationManager.NavigateTo($"/thing/edit/{Page.ToString()}");

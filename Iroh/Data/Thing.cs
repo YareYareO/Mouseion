@@ -7,7 +7,7 @@ namespace Iroh.Data
     public class Thing
     {
         public Thing() { Name = String.Empty; Description = String.Empty; Creator = String.Empty; }
-        public Thing(string name, string description, UsedInApp app)
+        public Thing(string name, string description, Subject app)
         {
             Name = name;
             Description = description;
@@ -23,7 +23,7 @@ namespace Iroh.Data
         public string Description { get; set; }
         [Column(TypeName = "timestamp")]
         public DateTime CreatedAt { get; set; }
-        public UsedInApp App { get; set; }
+        public Subject App { get; set; }
         public int Upvotes { get; set; } = 0;
         [Column(TypeName = "varchar(450)")]
         public string Creator { get; set; }

@@ -9,7 +9,7 @@ namespace Iroh.Data
         {
             Name = String.Empty;
         }
-        public Tag(string name, UsedInApp app)
+        public Tag(string name, Subject app)
         {
             Name = name;
         }

@@ -1,32 +1,39 @@
 ﻿@page "/"
-
 <PageTitle>Home</PageTitle>
 
-<h1>Discover the world</h1>
+<div class="container">
+        <h1>Discover the World</h1>
+        
+        <div class="terminal-card">
+            <header>The World</header>
+            <div>
+                <ul>
+                    <li><a href="/search/Event">Events</a></li>
+                    <li><a href="/search/Places">Places</a></li>
+                    <li><a href="/search/Animal">Animals</a></li>
+                    <li><a href="/search/Plant">Plants</a></li>
+                </ul>
+            </div>
+        </div>
 
-    
-<div class="wheelcontainer" id="draggable">
-    <div class="earth"></div>
-    <div class="wheel">
-        <span style="--i:0;"></span>
-        <span style="--i:1;"></span>
-        <span style="--i:2;"></span>
-        <span style="--i:3;"></span>
-        <span style="--i:4;"></span>
-        <span style="--i:5;"></span>
-        <span style="--i:6;"></span>
-        <span style="--i:7;"></span>
-    </div>
-    <div class="pages">
-        <a style="--i:0" href="/search/Person">People</a>
-        <a style="--i:1" href="/search/Event">Events</a>
-        <a style="--i:2" href="/search/Writing">Writings</a>
-        <a style="--i:3" href="/search/Art">Art</a>
-        <a style="--i:4" href="/search/Animal">Animals</a>
-        <a style="--i:5" href="/search/MotionPicture">Motion <br />Picture</a>
-        <a style="--i:6" href="/search/Music">Music</a>
-        <a style="--i:7" href="/search/Plant">Plants</a>
-    </div>
-</div>
+        <div class="terminal-card">
+            <header>The Individuals</header>
+            <div>
+                <ul>
+                    <li><a href="/search/Person">People</a></li>
+                </ul>
+            </div>
+        </div>
 
-<script src="../Components/Pages/Home.razor.js"></script>
+        <div class="terminal-card">
+            <header>The Art</header>
+            <div>
+                <ul>
+                    <li><a href="/search/Writing">Writings</a></li>
+                    <li><a href="/search/Art">Art</a></li>
+                    <li><a href="/search/MotionPicture">Motion Picture</a></li>
+                    <li><a href="/search/Music">Music</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>

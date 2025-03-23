@@ -1,63 +1,69 @@
-﻿@inject ISearchThingService SearchThingService
+﻿@using System.Diagnostics
+@inject ISearchThingService SearchThingService
 @inject ITagService TagService
 @inject NavigationManager NavigationManager
-@using System.Linq
 
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
-<!-- Tag functionalities -->
-@if (tags != null && chosen != null)
-{
-    var groupedTags = tags.GroupBy(tag => tag.Family)
-                          .OrderBy(group => group.Key); // Sortiere nach Enum-Wert der Familie
+<div class="terminal-form">
+    <fieldset>
+        <legend>Select Tags</legend>
 
-    @foreach (var group in groupedTags)
-    {
-        <div role="group" aria-label="checkboxgroup">
-            <label class="fw-bold fs-5 mt-0 ms-1">@group.Key</label>
+        <!-- Tag functionalities -->
+        @if (tags != null && chosen != null)
+        {
+            var groupedTags = tags.GroupBy(tag => tag.Family)
+                                .OrderBy(group => group.Key); // Sortiere nach Enum-Wert der Familie
 
-            @for (int i = 0; i < group.Count(); i++)
+            @foreach (var group in groupedTags)
             {
-                var tag = group.ElementAt(i);
-                var index = tags.IndexOf(tag);  // Um den richtigen Index von "chosen" zu behalten
+                <div role="group" aria-label="checkboxgroup" class="form-group terminal-checkbox-group">
+                    <label class="checkbox-group-name">@group.Key</label>
 
-                string btnid = "btncheck" + tag.Name;
-                <input type="checkbox" class="btn-check" id="@btnid" autocomplete="off" @bind="chosen[index]">
-                <label class="btn btn-outline-primary ms-1 mt-1" for="@btnid">@tag.Name</label>
+                    @for (int i = 0; i < group.Count(); i++)
+                    {
+                        var tag = group.ElementAt(i);
+                        var index = tags.IndexOf(tag);  // Um den richtigen Index von "chosen" zu behalten
+
+                        string btnid = "btncheck" + tag.Name;
+                        <div>
+                            <input type="checkbox" class="" id="@btnid" autocomplete="off" @bind="chosen[index]">
+                            <label class="" for="@btnid">@tag.Name</label>
+                        </div>
+                    }
+                </div>
             }
-        </div>
-    }
-}
-<br />
-<!-- Sorting -->
-<InputRadioGroup @bind-Value="sortBy">
-    <div class="form-check form-check-inline ms-2">
-        <InputRadio Value="@sortOptions[0]" class="form-check-input" id="SortByUpvotes"/> 
-        <label class="form-check-label" for="SortByUpvotes">@sortOptions[0]</label>
-    </div>
+        }
+        <br />
+        <!-- Sorting -->
+        @* <InputRadioGroup @bind-Value="sortBy">
+            <div class="form-check form-check-inline ms-2">
+                <InputRadio Value="@sortOptions[0]" class="form-check-input" id="SortByUpvotes"/> 
+                <label class="form-check-label" for="SortByUpvotes">@sortOptions[0]</label>
+            </div>
 
-    <div class="form-check form-check-inline">
-        <InputRadio Value="@sortOptions[1]" class="form-check-input" id="SortByNew" />
-        <label class="form-check-label" for="SortByNew">@sortOptions[1]</label>
-    </div>
-</InputRadioGroup>
-<button class="btn btn-primary" @onclick="@(() => SearchButtonPressed())">Search</button>
+            <div class="form-check form-check-inline">
+                <InputRadio Value="@sortOptions[1]" class="form-check-input" id="SortByNew" />
+                <label class="form-check-label" for="SortByNew">@sortOptions[1]</label>
+            </div>
+        </InputRadioGroup> *@
+        <div class="form-group">
+            <button class="btn btn-primary" @onclick="@(SearchButtonPressed)">Search</button>
+        </div>
+    </fieldset>
+</div>
 @if (isPopupVisible)
 {
-    <label class="ms-3">Found nothing!</label>
+    <label class="ms-3" style="color:white">Found nothing!</label>
 }
 <!-- Displaying Things -->
-@if(true)
-{
-    <Iroh.Components.Shared.ThingBook Things=@things />
-} else
-{
-    <Iroh.Components.Shared.ThingTable Things=@things />
-}
+
+<Iroh.Components.Shared.ThingTable Things=@things />
+
 
 
 <!-- Pagination-->
-<nav class="m-2" aria-label="Page navigation example">
+<nav class="terminal-pagination" aria-label="Page navigation">
     <ul class="pagination">
         <li class="page-item">
             <button class="page-link" @onclick="@(() => ChangePage(-1))">
@@ -72,70 +78,72 @@
         </li>
     </ul>
 </nav>
-
 @code {
     [Parameter]
-    public UsedInApp App { get; set; }
-    // for the tag functionalities but also needed for displaying things
+    public Subject currentSubject { get; set; }
     private List<Tag>? tags;
     private bool[]? chosen;
-    private string[] sortOptions = ["Upvotes", "New"];
-    private string? sortBy;
-    private int currentPage;
-    private bool isPopupVisible;
-    // for displaying things
+    //private string[] sortOptions = ["Upvotes", "New"];
+    private string sortBy = "New";
+    private int currentPage = 1;
+    private bool isPopupVisible = false;
     private List<Thing>? things;
 
     protected override async Task OnInitializedAsync()
     {
-        // for tag functionalities but also needed for displaying things
-        TagFamily[] families = TagService.GetTagFamilies(App);
+        
+        Console.WriteLine("ONINITIALIZED");
+        TagFamily[] families = TagService.GetTagFamilies(currentSubject);
         tags = await SearchThingService.GetTagsByFamilies(families);
         chosen = new bool[tags.Count];
-        sortBy = sortOptions[0];
         currentPage = 1;
         isPopupVisible = false;
-       
-        await StartSearch();
     }
     private async Task SearchButtonPressed()
     {
         this.currentPage = 1;
-        await StartSearch();
+        await HandleSearch();
     }
-    private async Task<bool> StartSearch()
-    {   // Service supports when no tag is selected. will just return all things inside the app.
-        List<int> chosenTagIds = new List<int>();
-        if (!chosen.All(tag => !tag))
-        {
-            Tag[] chosenTags = tags.Where((tag, index) => chosen[index]).ToArray();
-            chosenTagIds = chosenTags.Select(tag => tag.Id).ToList();
-        }
-        //TODO: Current page
-        List<Thing> foundthings = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: sortBy, app: App, currentPage: currentPage);
-        if (foundthings.Count > 0)
-        {
-            things = foundthings;
-            return true;
-        }
-        ShowPopup();
-        return false;
-    }
-
-    private async Task ChangePage(int changerate)
+    private async Task<bool> HandleSearch()
     {
-        this.currentPage += changerate;
+        List<Thing> foundThings = await SearchThings();
+        if (foundThings.Any())
+        {
+            this.things = foundThings;
+            return true;
+        }else{
+            FoundNothingPopup();
+            return false;
+        }
+    }
+    private async Task<List<Thing>> SearchThings()
+    {   
+        Debug.Assert(chosen != null);
+        Debug.Assert(tags != null);
+        List<Thing> foundthings;
+        if (chosen.Any(tag => tag))
+        {
+            List<int> chosenTagIds = tags.Where((tag, index) => chosen[index]).Select(tag => tag.Id).ToList();
+            foundthings = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: this.sortBy, subject: this.currentSubject, currentPage: this.currentPage);
+        }else{
+            foundthings = await SearchThingService.GetThingsNoTags(sortBy: this.sortBy, subject: this.currentSubject, currentPage: this.currentPage);
+        }
+        return foundthings;
+    }
+    private async Task ChangePage(int changeRate)
+    {
+        this.currentPage += changeRate;
         if(this.currentPage < 1)
         {
             this.currentPage = 1;
         }
-        bool isNextPageEmpty = !(await StartSearch());
+        bool isNextPageEmpty = !(await HandleSearch());
         if(isNextPageEmpty)
         {
-            this.currentPage -= changerate;
+            this.currentPage -= changeRate;
         }
     }
-    private async void ShowPopup()
+    private async void FoundNothingPopup()
     {
         isPopupVisible = true;
         StateHasChanged(); // UI sofort aktualisieren
