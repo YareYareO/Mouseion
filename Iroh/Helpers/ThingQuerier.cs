@@ -51,13 +51,13 @@ namespace Iroh.Helpers
         }
         private IQueryable<Thing> GetThingsNoTags()
         {
-            Debug.Assert(_context.Things != null);
+            Trace.Assert(_context.Things != null, "!!!!!!!!!!!!!!!!Context Things is null!!!!!!!!!!!!!!!!!!!");
             return _context.Things.Where(thing => thing.App == this.subject);
         }
         private IQueryable<Thing> GetThingsByTags(IEnumerable<int> tagIds)
         {
-            Debug.Assert(_context.Things != null);
-            Debug.Assert(_context.Descriptions != null);
+            Trace.Assert(_context.Things != null, "!!!!!!!!!!!!!!!!Context Things is null!!!!!!!!!!!!!!!!!!!");
+            Trace.Assert(_context.Descriptions != null, "!!!!!!!!!!!!!!!!Context Things is null!!!!!!!!!!!!!!!!!!!");
             var things = _context.Descriptions
                 .Where(description => tagIds.Contains(description.TagId))
                 .GroupBy(description => description.ThingId)

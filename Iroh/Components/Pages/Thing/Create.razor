@@ -1,4 +1,5 @@
 ﻿@page "/thing/edit/{AppString}"
+@using System.Diagnostics
 @inject IThingService ThingService
 @inject NavigationManager NavigationManager
 @inject ISearchThingService SearchThingService
@@ -9,17 +10,45 @@
 
 <form class="terminal-form">
     <fieldset>
-        <legend>Create new @App.ToString()</legend>
-        @if (tags != null && chosen != null)
-        {   // Display all Tags to choose from
-            @for (int i = 0; i < tags.Count; i++)
+        <legend>Create new @AppString</legend>
+        <fieldset>
+            <legend>Select Tags</legend>
+
+            @* @if (tags != null && chosen != null)
+            { // Display all Tags to choose from
+                @for (int i = 0; i < tags.Count; i++)
+                {
+                    var index = i;
+                    <label class="btn">
+                        <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
+                    </label>
+                }
+            } *@
+            @if (tags != null && chosen != null)
             {
-                var index = i;
-                <label class="btn">
-                    <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
-                </label>
+                var groupedTags = tags.GroupBy(tag => tag.Family)
+                .OrderBy(group => group.Key); // Sortiere nach Enum-Wert der Familie
+
+                @foreach (var group in groupedTags)
+                {
+                    <div role="group" aria-label="checkboxgroup" class="form-group terminal-checkbox-group">
+                        <label class="checkbox-group-name">@group.Key</label>
+
+                        @for (int i = 0; i < group.Count(); i++)
+                        {
+                            var tag = group.ElementAt(i);
+                            var index = tags.IndexOf(tag); // Um den richtigen Index von "chosen" zu behalten
+
+                            string btnid = "btncheck" + tag.Name;
+                            <div>
+                                <input type="checkbox" class="" id="@btnid" autocomplete="off" @bind="chosen[index]">
+                                <label class="" for="@btnid">@tag.Name</label>
+                            </div>
+                        }
+                    </div>
+                }
             }
-        }
+        </fieldset>
 
         <EditForm Model="CurrentThing" OnSubmit="HandleSubmit" Context="edit_context">
             <div class="form-group">
@@ -31,8 +60,12 @@
                 <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
             </div>
             <div class="form-group">
+                <label for="creator">Your Name (Just type something. It will not be displayed.</label>
+                <InputText id="creator" @bind-Value="CurrentThing.Creator" class="form-control" />
+            </div>
+            <div class="form-group">
                 <button type="submit" class="btn btn-primary">Submit</button>
-            </div>    
+            </div>
         </EditForm>
 
     </fieldset>
@@ -43,70 +76,57 @@
     public string? AppString { get; set; }
 
     public Thing CurrentThing { get; set; } = new();
-    private List<Tag> tags = new List<Tag>(0);
-    private bool[] chosen = new bool[0];
-    private Subject App;
+    private List<Tag>? tags;
+    private bool[]? chosen;
+    private Subject currentSubject;
 
 
     protected override async Task OnInitializedAsync()
     {
-        if(AppString != null)
+        if (AppString != null)
         {
-            App = TagService.GetEnumByString(AppString);    
+            currentSubject = TagService.GetEnumByString(AppString);
         }
 
-        TagFamily[] families = TagService.GetTagFamilies(App);
+        TagFamily[] families = TagService.GetTagFamilies(currentSubject);
         tags = await SearchThingService.GetTagsByFamilies(families);
 
         chosen = new bool[tags.Count];
-        
+
     }
 
     async Task HandleSubmit()
     {
-        if(tags.Count() == 0)
+        if((chosen == null) | (tags == null))
+        {
+            return;
+        }
+        if (!IsCurrentThingValid(CurrentThing))
         {
             return;
         }
         //Prepare List of tag ids to make descriptions
         List<int> chosenTagIds = new List<int>();
-        for(int i = 0; i < chosen.Length; i++)
+        for (int i = 0; i < chosen.Length; i++)
         {
             if (chosen[i])
             {
                 chosenTagIds.Add(tags[i].Id);
             }
         }
-        CurrentThing.Creator = "me lol";
-        CurrentThing.App = App;
-        // Create New
+        CurrentThing.App = currentSubject;
         CurrentThing.Upvotes = 0;
+        // Create New
         int thingId = await ThingService.CreateAsync(CurrentThing);
         await ThingService.UpdateDescriptions(chosenTagIds, thingId);
         NavigationManager.NavigateTo($"/search/{AppString}");
         return;
     }
-    bool[] GetChosenTags(int thingid)
+    private bool IsCurrentThingValid(Thing t)
     {
-        bool[] ret = new bool[tags.Count];
-
-        try
-        {
-            List<string> thingsTags = TagService.GetTagsByThing(thingid).Select(t => t.Name).ToList();
-            List<string> tagNames = tags.Select(t => t.Name).ToList();
-
-            for (int i = 0; i < ret.Length; i++)
-            {
-                if (thingsTags.Contains(tagNames[i]))
-                {
-                    ret[i] = true;
-                }
-            }
-        }
-        catch
-        {
-            ret = new bool[tags.Count];
-        }
-        return ret;
+        bool name = (t.Name != null && t.Name != "");
+        bool desc = (t.Description != null && t.Description != "");
+        bool creator = (t.Creator != null && t.Creator != "");
+        return name && desc && creator;
     }
 }

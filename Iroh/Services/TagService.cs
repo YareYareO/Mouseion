@@ -1,13 +1,9 @@
 ﻿using Iroh.Data;
-using Microsoft.EntityFrameworkCore;
-using System;
 
 namespace Iroh.Services
 {
-    public class TagService(ApplicationDbContext context) : ITagService
+    public class TagService() : ITagService
     {
-        private readonly ApplicationDbContext _context = context;
-
         public Subject GetEnumByString(string name) 
         {
             Subject[] apps = (Subject[])Enum.GetValues(typeof(Subject));
@@ -42,19 +38,6 @@ namespace Iroh.Services
                 return combinations[page];
             }
             return new TagFamily[0];
-        }
-        /*public List<int> GetTagsByThing(int thingId)
-        {
-            List<Description> descriptions = _context.Descriptions.Where(desc => desc.ThingId == thingId).ToList();
-            List<int> tagIds = descriptions.Select(d => d.TagId).ToList();
-            return tagIds;
-        }*/
-        public List<Tag> GetTagsByThing(int thingId)
-        {
-            List<Description> descriptions = _context.Descriptions.Where(desc => desc.ThingId == thingId).ToList();
-            List<int> tagIds = descriptions.Select(d => d.TagId).ToList();
-            List<Tag> tags = _context.Tags.Where(t => tagIds.Contains(t.Id)).ToList();
-            return tags;
         }
     }
 }

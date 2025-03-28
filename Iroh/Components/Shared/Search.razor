@@ -91,7 +91,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
         Console.WriteLine("ONINITIALIZED");
         TagFamily[] families = TagService.GetTagFamilies(currentSubject);
         tags = await SearchThingService.GetTagsByFamilies(families);
@@ -118,8 +117,10 @@
     }
     private async Task<List<Thing>> SearchThings()
     {   
-        Debug.Assert(chosen != null);
-        Debug.Assert(tags != null);
+        if((chosen == null) | (tags == null))
+        {
+            return things;
+        }
         List<Thing> foundthings;
         if (chosen.Any(tag => tag))
         {

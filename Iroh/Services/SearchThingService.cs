@@ -1,9 +1,6 @@
 ﻿using Iroh.Data;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
 using Iroh.Helpers;
-using System.Diagnostics;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Iroh.Services
 {
@@ -20,7 +17,6 @@ namespace Iroh.Services
         {
             ThingQuerier querier = new ThingQuerier(context: _context, chosentags: tags, currentPage: currentPage, sortBy: sortBy, subject: subject);
             var things = await querier.GetSortedThings().ToListAsync();
-            //var things = querier.GetByDapper().ToList();
             return things;
         }
         public async Task<List<Thing>> GetThingsNoTags(string sortBy, Subject subject, int currentPage)
