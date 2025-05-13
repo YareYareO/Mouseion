@@ -16,6 +16,15 @@ namespace Iroh.Data
             Upvotes = 0;
             Creator = String.Empty;
         }
+        public Thing(string name, string description)
+        {
+            Name = name;
+            Description = description;
+            App = Subject.Any;
+            CreatedAt = DateTime.Now;
+            Upvotes = 0;
+            Creator = String.Empty;
+        }
         public int Id { get; set; }
         [Column(TypeName = "varchar(100)")]
         public string Name { get; set; }
