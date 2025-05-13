@@ -1,4 +1,4 @@
-﻿@page "/search/Game"
+﻿@* @page "/search/Game"
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
@@ -8,7 +8,7 @@
 <h3>Search for Games!</h3>
 
 <button class="btn btn-primary" @onclick="@(() => CreateGame())">Create New</button>
-<Iroh.Components.Shared.Search subject=@Page />
+<Iroh.Components.Shared.Search currentSubject=@Page />
 
 @code {
     Subject Page = Subject.Game;
@@ -16,4 +16,4 @@
     {
         NavigationManager.NavigateTo($"/thing/edit/{Page.ToString()}");
     }
-}
+} *@
