@@ -88,7 +88,7 @@
             currentSubject = TagService.GetEnumByString(AppString);
         }
 
-        TagFamily[] families = TagService.GetTagFamilies(currentSubject);
+        TagFamily[] families = TagService.GetSubjectFamilies(currentSubject);
         tags = await SearchThingService.GetTagsByFamilies(families);
 
         chosen = new bool[tags.Count];

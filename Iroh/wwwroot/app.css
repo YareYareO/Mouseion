@@ -240,3 +240,38 @@ a:hover {
     border-color: #1a95e0;
     color: black;
 }
+
+.create-btn {
+    margin: 15px;
+}
+
+.search-btn {
+    margin-bottom: 6px;
+}
+
+body {
+    margin-left: 20%;
+    margin-right: 20%;
+    margin-top: 20px;
+}
+@media screen and (max-width: 1666px) {
+    body {
+        margin-left: 15%;
+        margin-right: 15%;
+        margin-top: 20px;
+    }
+}
+@media screen and (max-width: 1333px) {
+    body {
+        margin-left: 10%;
+        margin-right: 10%;
+        margin-top: 20px;
+    }
+}
+@media screen and (max-width: 1000px) {
+    body {
+        margin-left: 20px;
+        margin-right: 20px;
+        margin-top: 20px;
+    }
+}

@@ -2,7 +2,6 @@ using Iroh.Components;
 using Iroh.Data;
 using Iroh.Services;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,10 +22,6 @@ builder.Services.AddScoped<IThingService, ThingService>();
 builder.Services.AddScoped<ITagService, TagService>();
 //builder.Services.AddScoped<IUpvoteService, UpvoteService>();
 
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .WriteTo.Console()
-    .CreateLogger();
 
 var app = builder.Build();
 

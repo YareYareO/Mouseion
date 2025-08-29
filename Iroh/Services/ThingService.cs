@@ -1,6 +1,6 @@
 ﻿using Iroh.Data;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
+
 
 namespace Iroh.Services
 {
@@ -14,12 +14,10 @@ namespace Iroh.Services
                 thing.CreatedAt = DateTime.Now;
                 _context.Things.Add(thing);
                 await _context.SaveChangesAsync();
-                Log.Information("Created: {@thing}", thing);
                 return thing.Id;
             }
             catch (Exception)
             {
-                Log.Error("Create failed: {@thing}", thing);
                 throw;
             }
         }
@@ -32,14 +30,12 @@ namespace Iroh.Services
                 {
                     _context.Things.Remove(toDelete);
                     await _context.SaveChangesAsync();
-                    Log.Information($"Deleted: {toDelete}");
                     return;
                 }
                 throw new Exception();
             }
             catch (Exception)
             {
-                Log.Error($"Deleting failed: {id}");
                 throw;
             }
         }
@@ -55,14 +51,12 @@ namespace Iroh.Services
                     toUpdate.App = thing.App;
                     toUpdate.Creator = thing.Creator;
                     await _context.SaveChangesAsync();
-                    Log.Information($"Updated: {thing}");
                     return;
                 }
                 throw new Exception();
             }
             catch (Exception)
             {
-                Log.Error($"Updating failed: {thing}");
                 throw;
             }
         }

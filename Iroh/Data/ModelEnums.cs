@@ -13,7 +13,9 @@
        Game = 8,
        Plant = 9,
        VideoGame = 10,
-       Any = 11
+       Invention = 11,
+       Book = 12,
+       Any = 99
     }
 
     public enum TagFamily
@@ -39,5 +41,8 @@
         MusicGenre = 17,
         VideoGameGenre = 18,
         Fiction = 19,
+        Book = 20,
+        Invention = 21,
+        NonFictionGenre = 22
     }
 }
