@@ -120,10 +120,10 @@
     {   
         if((chosen == null) | (tags == null))
         {
-            return things;
+            return new List<Thing>(); // if chosen or tags is null, the page didnt load yet.
         }
         List<Thing> foundthings;
-        if (chosen.Any(tag => tag))
+        if (chosen == null ? false : chosen.Any(tag => tag) && tags != null)
         {
             List<int> chosenTagIds = tags.Where((tag, index) => chosen[index]).Select(tag => tag.Id).ToList();
             foundthings = await SearchThingService.GetThingsByTags(chosenTagIds, sortBy: this.sortBy, subject: this.currentSubject, currentPage: this.currentPage);

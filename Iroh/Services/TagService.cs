@@ -1,5 +1,6 @@
 ﻿using Iroh.Data;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
+using System.Diagnostics;
 using System.Text.Json;
 
 namespace Iroh.Services
@@ -75,7 +76,9 @@ namespace Iroh.Services
                 }
 
                 var json = File.ReadAllText(FilePath);
-                return JsonSerializer.Deserialize<Associations>(json);
+                Associations? ret = JsonSerializer.Deserialize<Associations>(json);
+                Debug.Assert(ret != null, "Import of Tag Family associations failed. Check TagService.cs or wwwroot/tag_family_associations.json");
+                return ret;
             }
         }
     }

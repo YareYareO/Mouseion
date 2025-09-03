@@ -92,27 +92,27 @@
         tags = await SearchThingService.GetTagsByFamilies(families);
 
         chosen = new bool[tags.Count];
-
     }
 
     async Task HandleSubmit()
     {
-        if((chosen == null) | (tags == null))
-        {
-            return;
-        }
         if (!IsCurrentThingValid(CurrentThing))
         {
-            return;
+            return; // Popup POWERBOMB
         }
         //Prepare List of tag ids to make descriptions
         List<int> chosenTagIds = new List<int>();
-        for (int i = 0; i < chosen.Length; i++)
+        if(chosen != null && tags != null)
         {
-            if (chosen[i])
+            for (int i = 0; i < chosen.Length; i++)
             {
-                chosenTagIds.Add(tags[i].Id);
+                if (chosen[i])
+                {
+                    chosenTagIds.Add(tags[i].Id);
+                }
             }
+        } else {
+            return; // Popup POWERBOMB
         }
         CurrentThing.App = currentSubject;
         CurrentThing.Upvotes = 0;
@@ -127,6 +127,12 @@
         bool name = (t.Name != null && t.Name != "");
         bool desc = (t.Description != null && t.Description != "");
         bool creator = (t.Creator != null && t.Creator != "");
+
+        char[] needle = {'\'', '\"', ';', '\\', '<', '>', '&', '%', '#', '?', '|', '`'};
+        bool noStrangeCharsInName = (t.Name == null) ? false: needle.Any(c => t.Name.Contains(c));
+        bool noStrangeCharsInDescription = (t.Description == null) ? false: needle.Any(c => t.Description.Contains(c));
+        bool noStrangeCharsInCreator = (t.Creator == null) ? false: needle.Any(c => t.Creator.Contains(c));
+        
         return name && desc && creator;
     }
 }
