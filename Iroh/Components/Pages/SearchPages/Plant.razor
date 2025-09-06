@@ -1,4 +1,4 @@
-﻿@page "/search/Plant"
+﻿@* @page "/search/Plant"
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
@@ -16,4 +16,4 @@
     {
         NavigationManager.NavigateTo($"/thing/edit/{Page.ToString()}");
     }
-}
+} *@

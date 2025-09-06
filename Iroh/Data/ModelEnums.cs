@@ -37,12 +37,11 @@
         Science = 13,
         Sport = 14,
         FictionGenre = 15,
-        Genre = 16,
+        Category = 16,
         MusicGenre = 17,
         VideoGameGenre = 18,
-        Fiction = 19,
-        Book = 20,
-        Invention = 21,
-        NonFictionGenre = 22
+        Reality = 19,
+
+        Invention = 20,
     }
 }

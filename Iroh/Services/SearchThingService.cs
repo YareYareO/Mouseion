@@ -27,8 +27,8 @@ namespace Iroh.Services
                           where thing.App == subject && things.Contains(thing.Id)
                           orderby thing.CreatedAt
                           select new { thing.Name, thing.Description })
-                    .Skip((currentPage - 1) * 10)
-                    .Take(10)
+                    .Skip((currentPage - 1) * 15)
+                    .Take(15)
                     .Select(x => new Thing { Name = x.Name, Description = x.Description });
                     
             return await result.ToListAsync();
@@ -42,8 +42,8 @@ namespace Iroh.Services
                 orderby thing.CreatedAt
                 select new { thing.Name, thing.Description }; 
             var result = await idk
-                    .Skip((currentPage - 1) * 10)
-                    .Take(10)
+                    .Skip((currentPage - 1) * 15)
+                    .Take(15)
                     .Select(x => new Thing { Name = x.Name, Description = x.Description }).ToListAsync();
             return result;
             //return things;

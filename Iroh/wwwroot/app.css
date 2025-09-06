@@ -136,6 +136,7 @@ a:hover {
     padding: 10px;
     border: 1px solid #e9e9e9;
     border-radius: 5px;
+    flex-wrap: wrap;
 }
 /* Checkbox labels */
 .terminal-checkbox-group label {
@@ -175,6 +176,8 @@ a:hover {
 }
 .checkbox-group-name {
     width: fit-content;
+    text-decoration: underline;
+    font-weight: bold;
 }
 
 

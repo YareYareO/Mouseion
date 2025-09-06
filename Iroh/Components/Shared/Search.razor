@@ -6,7 +6,7 @@
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
 <div class="terminal-form">
-    <fieldset>
+    <fieldset class="tagfield">
         <legend>Select Tags</legend>
 
         <!-- Tag functionalities -->
@@ -18,7 +18,7 @@
             @foreach (var group in groupedTags)
             {
                 <div role="group" aria-label="checkboxgroup" class="form-group terminal-checkbox-group">
-                    <label class="checkbox-group-name">@group.Key</label>
+                    <label class="checkbox-group-name">@SplitCamelCase(group.Key.ToString())</label>
 
                     @for (int i = 0; i < group.Count(); i++)
                     {
@@ -152,5 +152,19 @@
         await Task.Delay(2000); // 3 Sekunden warten
         isPopupVisible = false;
         StateHasChanged(); // Popup ausblenden
+    }
+    public static string SplitCamelCase(string input)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+        var sb = new System.Text.StringBuilder();
+        sb.Append(input[0]);
+        for (int i = 1; i < input.Length; i++)
+        {
+            char c = input[i];
+            if (char.IsUpper(c) && !char.IsWhiteSpace(input[i - 1]))
+                sb.Append(' ');
+            sb.Append(c);
+        }
+        return sb.ToString();
     }
 }
