@@ -1,4 +1,4 @@
-﻿@page "/search/Place"
+﻿@page "/Place/search"
 @inject NavigationManager NavigationManager
 @rendermode @(new InteractiveServerRenderMode(prerender: false))
 
@@ -14,6 +14,6 @@
     Subject Page = Subject.Place;
     private void CreateGame()
     {
-        NavigationManager.NavigateTo($"/thing/edit/{Page.ToString()}");
+        NavigationManager.NavigateTo($"/{Page.ToString()}/create");
     }
 }
