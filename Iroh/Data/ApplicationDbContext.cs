@@ -217,10 +217,9 @@ namespace Iroh.Data
                 new Tag { Id = 170, Name = "Fictional", Family = TagFamily.Reality},
                 new Tag { Id = 171, Name = "Mythological", Family = TagFamily.Reality},
                 new Tag { Id = 172, Name = "Religious", Family = TagFamily.Reality}
-                // TODO Timer bei create page
+
                 // TODO Regeln und Guidelines aufschreiben
                 // TODO Check ob titel schon existiert
-                // TODO Plant
         );
         }
     }

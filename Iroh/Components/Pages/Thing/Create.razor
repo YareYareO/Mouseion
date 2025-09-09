@@ -1,5 +1,7 @@
-﻿@page "/thing/edit/{AppString}"
+﻿@page "/{AppString}/create"
 @using System.Diagnostics
+@using System.ComponentModel.DataAnnotations
+@implements IDisposable
 @inject IThingService ThingService
 @inject NavigationManager NavigationManager
 @inject ISearchThingService SearchThingService
@@ -50,36 +52,74 @@
             }
         </fieldset>
 
-        <EditForm Model="CurrentThing" OnSubmit="HandleSubmit" Context="edit_context">
+        <EditForm Model="CurrentThing" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" Context="edit_context">
+            <DataAnnotationsValidator />
             <div class="form-group">
                 <label for="name">Name</label>
                 <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control" />
+                <ValidationMessage For="@(() => CurrentThing.Name)"/>
             </div>
             <div class="form-group">
                 <label for="desc">Description</label>
                 <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
+                <ValidationMessage For="@(() => CurrentThing.Description)"/>
             </div>
             <div class="form-group">
-                <label for="creator">Your Name (Just type something. It will not be displayed.)</label>
+                <label for="creator">Your Nickname (Just type something. It will not be displayed.)</label>
                 <InputText id="creator" @bind-Value="CurrentThing.Creator" class="form-control" />
+                <ValidationMessage For="@(() => CurrentThing.Creator)"/>
             </div>
             <div class="form-group">
-                <button type="submit" class="btn btn-primary">Submit</button>
+                <button id="submitBtn" type="submit" class="btn btn-primary">Submit</button>
             </div>
         </EditForm>
-
+    <div id="countdown">Hallo</div>
     </fieldset>
 </form>
+<p>
+    Rules & Guidelines:
+    1. Relevance: Think to yourself "Would anybody care about this 50 years from now?"
+    2. Details: Keep the description short enough to interest a reader to investigate further.
+    3. Name and description can not include following characters: ', ", ;, \, &, %, #, ?, |, `, >
+    4. 
+</p>
+
+
+<script>
+(function() {
+    
+    const countdown = document.getElementById('countdown');
+    const DELAY_SECONDS = 30;
+    const initTime = Date.now();
+
+    function secondsRemaining() {
+        const elapsedMs = Date.now() - initTime;
+        const remaining = Math.ceil((DELAY_SECONDS * 1000 - elapsedMs) / 1000);
+        return Math.max(0, remaining);
+    }
+    function updateUI() {
+        const rem = secondsRemaining();
+        if (rem > 0) {
+            countdown.textContent = 'Please wait ' + rem + ' second' + (rem !== 1 ? 's' : '') + ' before submitting.';
+        } else {
+            countdown.textContent = 'You are free to post!';
+            clearInterval(intervalId);
+        }
+    }
+    const intervalId = setInterval(updateUI, 1000);
+    updateUI(); 
+})();
+</script>
 
 @code {
     [Parameter]
     public string? AppString { get; set; }
-
     public Thing CurrentThing { get; set; } = new();
     private List<Tag>? tags;
     private bool[]? chosen;
     private Subject currentSubject;
-
+    private DateTime initalTime;
+    private EditContext? editContext;
 
     protected override async Task OnInitializedAsync()
     {
@@ -92,15 +132,18 @@
         tags = await SearchThingService.GetTagsByFamilies(families);
 
         chosen = new bool[tags.Count];
+        initalTime = DateTime.UtcNow;
+        editContext = new EditContext(CurrentThing);
+        editContext.OnFieldChanged += HandleFieldChanged;
     }
 
-    async Task HandleSubmit()
+    async Task HandleValidSubmit()
     {
-        if (!IsCurrentThingValid(CurrentThing))
+        if((DateTime.UtcNow - initalTime) <= TimeSpan.FromSeconds(29))
         {
-            return; // Popup POWERBOMB
+            Debug.WriteLine($"Submitted too early {initalTime - DateTime.UtcNow}!");
+            return;
         }
-        //Prepare List of tag ids to make descriptions
         List<int> chosenTagIds = new List<int>();
         if(chosen != null && tags != null)
         {
@@ -112,27 +155,38 @@
                 }
             }
         } else {
-            return; // Popup POWERBOMB
+            Debug.WriteLine("What the helly!");
+            return;
+        }
+        if(chosenTagIds.Count < 1)
+        {
+            Debug.WriteLine("Bro choose some Tags!");
+            return;
         }
         CurrentThing.App = currentSubject;
         CurrentThing.Upvotes = 0;
-        // Create New
+
         int thingId = await ThingService.CreateAsync(CurrentThing);
         await ThingService.UpdateDescriptions(chosenTagIds, thingId);
-        NavigationManager.NavigateTo($"/search/{AppString}");
+        NavigationManager.NavigateTo($"/{AppString}/search");
         return;
     }
-    private bool IsCurrentThingValid(Thing t)
+    void HandleInvalidSubmit()
     {
-        bool name = (t.Name != null && t.Name != "");
-        bool desc = (t.Description != null && t.Description != "");
-        bool creator = (t.Creator != null && t.Creator != "");
-
-        char[] needle = {'\'', '\"', ';', '\\', '<', '>', '&', '%', '#', '?', '|', '`'};
-        bool noStrangeCharsInName = (t.Name == null) ? false: needle.Any(c => t.Name.Contains(c));
-        bool noStrangeCharsInDescription = (t.Description == null) ? false: needle.Any(c => t.Description.Contains(c));
-        bool noStrangeCharsInCreator = (t.Creator == null) ? false: needle.Any(c => t.Creator.Contains(c));
-        
-        return name && desc && creator;
+        Debug.WriteLine("Input not valid!");
+        return;
     }
+    private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    {
+        if(editContext != null)
+        {
+            editContext.NotifyValidationStateChanged();
+        }
+    }
+    public void Dispose()
+    {
+        if (editContext != null)
+            editContext.OnFieldChanged -= HandleFieldChanged;
+    } 
+    // TODO Check nach demselben Namen.
 }
