@@ -52,7 +52,7 @@
             }
         </fieldset>
 
-        <EditForm Model="CurrentThing" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" Context="edit_context">
+        <EditForm OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" EditContext=@_editContext>
             <DataAnnotationsValidator />
             <div class="form-group">
                 <label for="name">Name</label>
@@ -116,32 +116,36 @@
     public string? AppString { get; set; }
     public Thing CurrentThing { get; set; } = new();
     private List<Tag>? tags;
-    private bool[]? chosen;
+    private bool[]? chosen; 
     private Subject currentSubject;
     private DateTime initalTime;
-    private EditContext? editContext;
-
+    private ValidationMessageStore? _messageStore;
+    private EditContext? _editContext;
+    
     protected override async Task OnInitializedAsync()
     {
-        if (AppString != null)
+        if (AppString != null) // TODO was passiert ohne appstring?
         {
             currentSubject = TagService.GetEnumByString(AppString);
         }
 
+        initalTime = DateTime.UtcNow;
+        CurrentThing = new Thing(currentSubject);
+        _editContext = new EditContext(CurrentThing);
+        _messageStore = new ValidationMessageStore(_editContext);
+        _editContext.OnFieldChanged += (s, e) => _messageStore.Clear(e.FieldIdentifier);
+        _editContext.OnFieldChanged += HandleFieldChanged;
+
         TagFamily[] families = TagService.GetSubjectFamilies(currentSubject);
         tags = await SearchThingService.GetTagsByFamilies(families);
-
         chosen = new bool[tags.Count];
-        initalTime = DateTime.UtcNow;
-        editContext = new EditContext(CurrentThing);
-        editContext.OnFieldChanged += HandleFieldChanged;
     }
 
     async Task HandleValidSubmit()
     {
         if((DateTime.UtcNow - initalTime) <= TimeSpan.FromSeconds(29))
         {
-            Debug.WriteLine($"Submitted too early {initalTime - DateTime.UtcNow}!");
+            Debug.WriteLine($"Submitted too early!");
             return;
         }
         List<int> chosenTagIds = new List<int>();
@@ -161,11 +165,19 @@
         if(chosenTagIds.Count < 1)
         {
             Debug.WriteLine("Bro choose some Tags!");
+            var field = FieldIdentifier.Create(() => CurrentThing.Creator);
+            if(_messageStore != null) {_messageStore.Add(field, "A post needs to have at least one fitting tag selected.");}
+            if(_editContext != null) {_editContext.NotifyValidationStateChanged();}
+            return; // TODO UPDATE DATABASE
+        }
+        if(ThingService.DoesNameExist(CurrentThing.Name, currentSubject))
+        {
+            Debug.WriteLine("Name already exists!");
+            var field = FieldIdentifier.Create(() => CurrentThing.Name);
+            if(_messageStore != null) {_messageStore.Add(field, "A post with this name is already in use. Duplicate posts are not allowed!");}
+            if(_editContext != null) {_editContext.NotifyValidationStateChanged();}
             return;
         }
-        CurrentThing.App = currentSubject;
-        CurrentThing.Upvotes = 0;
-
         int thingId = await ThingService.CreateAsync(CurrentThing);
         await ThingService.UpdateDescriptions(chosenTagIds, thingId);
         NavigationManager.NavigateTo($"/{AppString}/search");
@@ -176,17 +188,19 @@
         Debug.WriteLine("Input not valid!");
         return;
     }
-    private void HandleFieldChanged(object sender, FieldChangedEventArgs e)
+    private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
     {
-        if(editContext != null)
+        if(_editContext != null)
         {
-            editContext.NotifyValidationStateChanged();
+            _editContext.NotifyValidationStateChanged();
         }
     }
     public void Dispose()
     {
-        if (editContext != null)
-            editContext.OnFieldChanged -= HandleFieldChanged;
-    } 
-    // TODO Check nach demselben Namen.
+        if (_editContext != null && _messageStore != null)
+        {
+            _editContext.OnFieldChanged -= (s, e) => _messageStore.Clear(e.FieldIdentifier);
+            _editContext.OnFieldChanged -= HandleFieldChanged;
+        }
+    }
 }

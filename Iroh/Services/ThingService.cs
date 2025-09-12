@@ -78,27 +78,31 @@ namespace Iroh.Services
         }
         public async Task UpdateDescriptions(List<int> chosenTags, int thingId)
         {
-                var oldDescriptions = await _context.Descriptions
-                                    .Where(d => d.ThingId == thingId)
-                                    .ToListAsync();
+            var oldDescriptions = await _context.Descriptions
+                                .Where(d => d.ThingId == thingId)
+                                .ToListAsync();
 
-                // Determine tags for addition and removal
-                var tagsToAdd = chosenTags.Except(oldDescriptions.Select(d => d.TagId));
-                var tagsToRemove = oldDescriptions.Where(d => !chosenTags.Contains(d.TagId))
-                    .Select(d => d.TagId);
+            // Determine tags for addition and removal
+            var tagsToAdd = chosenTags.Except(oldDescriptions.Select(d => d.TagId));
+            var tagsToRemove = oldDescriptions.Where(d => !chosenTags.Contains(d.TagId))
+                .Select(d => d.TagId);
 
-                // Add new descriptions in a single batch
-                foreach (int tagId in tagsToAdd)
-                {
-                    _context.Descriptions.Add(new Description { ThingId = thingId, TagId = tagId });
-                }
+            // Add new descriptions in a single batch
+            foreach (int tagId in tagsToAdd)
+            {
+                _context.Descriptions.Add(new Description { ThingId = thingId, TagId = tagId });
+            }
 
-                // Remove old descriptions efficiently
-                _context.Descriptions.RemoveRange(oldDescriptions.Where(d => tagsToRemove.Contains(d.TagId)));
+            // Remove old descriptions efficiently
+            _context.Descriptions.RemoveRange(oldDescriptions.Where(d => tagsToRemove.Contains(d.TagId)));
 
-                // Save changes in a single operation
-                await _context.SaveChangesAsync();
+            // Save changes in a single operation
+            await _context.SaveChangesAsync();
         }
-        
-    }
+        public  bool DoesNameExist(string userInput, Subject subject)
+        {
+            bool exists = _context.Things.Where(t => t.App == subject).Any(e => e.Name == userInput);
+            return exists;
+        }
+    }   
 }

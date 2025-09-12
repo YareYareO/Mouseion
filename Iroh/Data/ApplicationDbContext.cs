@@ -219,7 +219,6 @@ namespace Iroh.Data
                 new Tag { Id = 172, Name = "Religious", Family = TagFamily.Reality}
 
                 // TODO Regeln und Guidelines aufschreiben
-                // TODO Check ob titel schon existiert
         );
         }
     }
