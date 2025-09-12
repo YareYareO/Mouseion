@@ -15,21 +15,10 @@
         <legend>Create new @AppString</legend>
         <fieldset>
             <legend>Select Tags</legend>
-
-            @* @if (tags != null && chosen != null)
-            { // Display all Tags to choose from
-                @for (int i = 0; i < tags.Count; i++)
-                {
-                    var index = i;
-                    <label class="btn">
-                        <input type="checkbox" @bind="chosen[index]" /> @tags[i].Name
-                    </label>
-                }
-            } *@
-            @if (tags != null && chosen != null)
+            @if (page.tags.Count > 0)
             {
-                var groupedTags = tags.GroupBy(tag => tag.Family)
-                .OrderBy(group => group.Key); // Sortiere nach Enum-Wert der Familie
+                var groupedTags = page.tags.GroupBy(tag => tag.Family)
+                .OrderBy(group => group.Key); // Sortiere nach Enum-Wert der Familie SORTIERE NACH JSON REIHENFOLGE TODO
 
                 @foreach (var group in groupedTags)
                 {
@@ -39,11 +28,11 @@
                         @for (int i = 0; i < group.Count(); i++)
                         {
                             var tag = group.ElementAt(i);
-                            var index = tags.IndexOf(tag); // Um den richtigen Index von "chosen" zu behalten
+                            var index = page.tags.IndexOf(tag); // Um den richtigen Index von "chosen" zu behalten
 
                             string btnid = "btncheck" + tag.Name;
                             <div>
-                                <input type="checkbox" class="" id="@btnid" autocomplete="off" @bind="chosen[index]">
+                                <input type="checkbox" class="" id="@btnid" autocomplete="off" @bind="page.chosen[index]">
                                 <label class="" for="@btnid">@tag.Name</label>
                             </div>
                         }
@@ -52,22 +41,22 @@
             }
         </fieldset>
 
-        <EditForm OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" EditContext=@_editContext>
+        <EditForm OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" EditContext=page._editContext>
             <DataAnnotationsValidator />
             <div class="form-group">
                 <label for="name">Name</label>
-                <InputText id="name" @bind-Value="CurrentThing.Name" class="form-control" />
-                <ValidationMessage For="@(() => CurrentThing.Name)"/>
+                <InputText id="name" @bind-Value="page.CurrentThing.Name" class="form-control" />
+                <ValidationMessage For="@(() => page.CurrentThing.Name)"/>
             </div>
             <div class="form-group">
                 <label for="desc">Description</label>
-                <InputText id="desc" @bind-Value="CurrentThing.Description" class="form-control" />
-                <ValidationMessage For="@(() => CurrentThing.Description)"/>
+                <InputText id="desc" @bind-Value="page.CurrentThing.Description" class="form-control" />
+                <ValidationMessage For="@(() => page.CurrentThing.Description)"/>
             </div>
             <div class="form-group">
                 <label for="creator">Your Nickname (Just type something. It will not be displayed.)</label>
-                <InputText id="creator" @bind-Value="CurrentThing.Creator" class="form-control" />
-                <ValidationMessage For="@(() => CurrentThing.Creator)"/>
+                <InputText id="creator" @bind-Value="page.CurrentThing.Creator" class="form-control" />
+                <ValidationMessage For="@(() => page.CurrentThing.Creator)"/>
             </div>
             <div class="form-group">
                 <button id="submitBtn" type="submit" class="btn btn-primary">Submit</button>
@@ -114,71 +103,89 @@
 @code {
     [Parameter]
     public string? AppString { get; set; }
-    public Thing CurrentThing { get; set; } = new();
-    private List<Tag>? tags;
-    private bool[]? chosen; 
-    private Subject currentSubject;
-    private DateTime initalTime;
-    private ValidationMessageStore? _messageStore;
-    private EditContext? _editContext;
-    
+    private CPage page { get; set; } = new();
+    class CPage
+    { // Exists to evade "possible" null calls
+        public Thing CurrentThing { get; set;}
+        public List<Tag> tags { get; set;}
+        public bool[] chosen { get; set;}
+        public readonly Subject currentSubject;
+        public readonly DateTime initalTime;
+        public EditContext _editContext { get; set;}
+        public ValidationMessageStore _messageStore { get; set;}
+        public CPage()
+        {
+            currentSubject = Subject.Any;
+            CurrentThing = new Thing(currentSubject);
+            _editContext = new EditContext(CurrentThing);
+            _messageStore = new ValidationMessageStore(_editContext);
+            initalTime = DateTime.UtcNow;
+            tags = new List<Tag>(0);
+            chosen = new bool[0];
+        }
+        public CPage(Subject sub)
+        {
+            currentSubject = sub;
+            CurrentThing = new Thing(currentSubject);
+            _editContext = new EditContext(CurrentThing);
+            _messageStore = new ValidationMessageStore(_editContext);
+            initalTime = DateTime.UtcNow;
+            tags = new List<Tag>(0);
+            chosen = new bool[0];
+        }
+        public void InitTags(List<Tag> ts)
+        {
+            this.tags = ts;
+            chosen = new bool[this.tags.Count];
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
+        Subject currentSubject = Subject.Any;
         if (AppString != null) // TODO was passiert ohne appstring?
         {
             currentSubject = TagService.GetEnumByString(AppString);
         }
-
-        initalTime = DateTime.UtcNow;
-        CurrentThing = new Thing(currentSubject);
-        _editContext = new EditContext(CurrentThing);
-        _messageStore = new ValidationMessageStore(_editContext);
-        _editContext.OnFieldChanged += (s, e) => _messageStore.Clear(e.FieldIdentifier);
-        _editContext.OnFieldChanged += HandleFieldChanged;
-
         TagFamily[] families = TagService.GetSubjectFamilies(currentSubject);
-        tags = await SearchThingService.GetTagsByFamilies(families);
-        chosen = new bool[tags.Count];
+        List<Tag> tags = await SearchThingService.GetTagsByFamilies(families);
+            
+        // DO NOT add tags to constructer of CPage. if the wait is too long, the page will crash because EditContext cant initialize properly.
+        page = new CPage(currentSubject); 
+        page._editContext.OnFieldChanged += (s, e) => page._messageStore.Clear(e.FieldIdentifier);
+        page._editContext.OnFieldChanged += HandleFieldChanged;
+        page.InitTags(tags);
     }
 
     async Task HandleValidSubmit()
     {
-        if((DateTime.UtcNow - initalTime) <= TimeSpan.FromSeconds(29))
+        if((DateTime.UtcNow - page.initalTime) <= TimeSpan.FromSeconds(29))
         {
             Debug.WriteLine($"Submitted too early!");
             return;
         }
         List<int> chosenTagIds = new List<int>();
-        if(chosen != null && tags != null)
+        
+        for (int i = 0; i < page.chosen.Length; i++)
         {
-            for (int i = 0; i < chosen.Length; i++)
-            {
-                if (chosen[i])
-                {
-                    chosenTagIds.Add(tags[i].Id);
-                }
-            }
-        } else {
-            Debug.WriteLine("What the helly!");
-            return;
+            if (page.chosen[i]) chosenTagIds.Add(page.tags[i].Id);
         }
         if(chosenTagIds.Count < 1)
         {
             Debug.WriteLine("Bro choose some Tags!");
-            var field = FieldIdentifier.Create(() => CurrentThing.Creator);
-            if(_messageStore != null) {_messageStore.Add(field, "A post needs to have at least one fitting tag selected.");}
-            if(_editContext != null) {_editContext.NotifyValidationStateChanged();}
+            var field = FieldIdentifier.Create(() => page.CurrentThing.Creator);
+            page._messageStore.Add(field, "A post needs to have at least one fitting tag selected.");
+            page._editContext.NotifyValidationStateChanged();
             return; // TODO UPDATE DATABASE
         }
-        if(ThingService.DoesNameExist(CurrentThing.Name, currentSubject))
+        if(ThingService.DoesNameExist(page.CurrentThing.Name, page.currentSubject))
         {
             Debug.WriteLine("Name already exists!");
-            var field = FieldIdentifier.Create(() => CurrentThing.Name);
-            if(_messageStore != null) {_messageStore.Add(field, "A post with this name is already in use. Duplicate posts are not allowed!");}
-            if(_editContext != null) {_editContext.NotifyValidationStateChanged();}
+            var field = FieldIdentifier.Create(() => page.CurrentThing.Name);
+            page._messageStore.Add(field, "A post with this name is already in use. Duplicate posts are not allowed!");
+            page._editContext.NotifyValidationStateChanged();
             return;
         }
-        int thingId = await ThingService.CreateAsync(CurrentThing);
+        int thingId = await ThingService.CreateAsync(page.CurrentThing);
         await ThingService.UpdateDescriptions(chosenTagIds, thingId);
         NavigationManager.NavigateTo($"/{AppString}/search");
         return;
@@ -190,17 +197,11 @@
     }
     private void HandleFieldChanged(object? sender, FieldChangedEventArgs e)
     {
-        if(_editContext != null)
-        {
-            _editContext.NotifyValidationStateChanged();
-        }
+        page._editContext.NotifyValidationStateChanged();
     }
     public void Dispose()
     {
-        if (_editContext != null && _messageStore != null)
-        {
-            _editContext.OnFieldChanged -= (s, e) => _messageStore.Clear(e.FieldIdentifier);
-            _editContext.OnFieldChanged -= HandleFieldChanged;
-        }
+        page._editContext.OnFieldChanged -= (s, e) => page._messageStore.Clear(e.FieldIdentifier);
+        page._editContext.OnFieldChanged -= HandleFieldChanged;
     }
 }
