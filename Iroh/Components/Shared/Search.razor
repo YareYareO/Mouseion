@@ -56,8 +56,10 @@
 
 <Iroh.Components.Shared.ThingTable Things=@things />
 
-
-
+@if (isPopupVisible)
+{
+    <label class="ms-3" style="color:white">Found nothing!</label>
+}
 <!-- Pagination-->
 <nav class="terminal-pagination" aria-label="Page navigation">
     <ul class="pagination">
@@ -74,10 +76,7 @@
         </li>
     </ul>
 </nav>
-@if (isPopupVisible)
-{
-    <label class="ms-3" style="color:white">Found nothing!</label>
-}
+
 @code {
     [Parameter]
     public Subject currentSubject { get; set; }
@@ -112,7 +111,6 @@
             return true;
         }else{
             FoundNothingPopup();
-            // await ChangePage(-1); maybe maybe not, hmmmmm design TODO
             return false;
         }
     }

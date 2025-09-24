@@ -17,8 +17,9 @@
             <legend>Select Tags</legend>
             @if (page.tags.Count > 0)
             {
+
                 var groupedTags = page.tags.GroupBy(tag => tag.Family)
-                .OrderBy(group => group.Key); // Sortiere nach Enum-Wert der Familie SORTIERE NACH JSON REIHENFOLGE TODO
+                .OrderBy(group => group.Key);
 
                 @foreach (var group in groupedTags)
                 {
@@ -44,34 +45,41 @@
         <EditForm OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit" EditContext=page._editContext>
             <DataAnnotationsValidator />
             <div class="form-group">
-                <label for="name">Name</label>
+                <label for="name" class="checkbox-group-name" style="margin-top: 20px">Name</label>
                 <InputText id="name" @bind-Value="page.CurrentThing.Name" class="form-control" />
                 <ValidationMessage For="@(() => page.CurrentThing.Name)"/>
             </div>
             <div class="form-group">
-                <label for="desc">Description</label>
+                <label for="desc" class="checkbox-group-name">Description</label>
                 <InputText id="desc" @bind-Value="page.CurrentThing.Description" class="form-control" />
                 <ValidationMessage For="@(() => page.CurrentThing.Description)"/>
             </div>
             <div class="form-group">
-                <label for="creator">Your Nickname (Just type something. It will not be displayed.)</label>
+                <label for="creator" class="checkbox-group-name">Your Nickname</label>
                 <InputText id="creator" @bind-Value="page.CurrentThing.Creator" class="form-control" />
                 <ValidationMessage For="@(() => page.CurrentThing.Creator)"/>
             </div>
+            <fieldset>
+                <legend>Rules & Guidelines:</legend>
+                <ol>
+                    <li>Relevance: Think to yourself: "Would anybody care about this 10 years from now?"</li>
+                    <li>Details: Keep the description short enough to spark a reader's interest to investigate further.</li>
+                    <li>Name and description can not include following characters: ', ", ;, \, &, %, #, ?, |, `, ></li>
+                    <li>Duplicates: Try not to upload something, that has already been uploaded. The system will detect when names match, but do look into it yourself.</li>
+                    <li>Tags: Select all tags that might fit. Think to yourself: "if somebody searches for this tag only, should this thing be displayed?".</li>
+                    <li>Neutrality: Avoid subjectivity, bias or personal commentary. Keep the description and name neutral.</li>
+                    <li>Humanity: Do not upload using bots or AIs of any sort. Humans only.</li>
+                    <li>You: Your nickname does not have to match across your posts and will not be publicly displayed. It is there to make potential future features possible.</li>
+                    <li>Language: Keep all texts in english.</li>
+                </ol>
+            </fieldset>
             <div class="form-group">
-                <button id="submitBtn" type="submit" class="btn btn-primary">Submit</button>
+                <button id="submitBtn" type="submit" class="btn btn-primary create-btn">Submit</button>
             </div>
         </EditForm>
     <div id="countdown">Hallo</div>
     </fieldset>
 </form>
-<p>
-    Rules & Guidelines:
-    1. Relevance: Think to yourself "Would anybody care about this 50 years from now?"
-    2. Details: Keep the description short enough to interest a reader to investigate further.
-    3. Name and description can not include following characters: ', ", ;, \, &, %, #, ?, |, `, >
-    4. 
-</p>
 
 
 <script>
@@ -141,10 +149,10 @@
     }
     protected override async Task OnInitializedAsync()
     {
-        Subject currentSubject = Subject.Any;
-        if (AppString != null) // TODO was passiert ohne appstring?
+        Subject currentSubject = TagService.GetEnumByString(AppString);
+        if (currentSubject == Subject.Any)
         {
-            currentSubject = TagService.GetEnumByString(AppString);
+            NavigationManager.NavigateTo($"/");
         }
         TagFamily[] families = TagService.GetSubjectFamilies(currentSubject);
         List<Tag> tags = await SearchThingService.GetTagsByFamilies(families);
@@ -175,7 +183,7 @@
             var field = FieldIdentifier.Create(() => page.CurrentThing.Creator);
             page._messageStore.Add(field, "A post needs to have at least one fitting tag selected.");
             page._editContext.NotifyValidationStateChanged();
-            return; // TODO UPDATE DATABASE
+            return;
         }
         if(ThingService.DoesNameExist(page.CurrentThing.Name, page.currentSubject))
         {
