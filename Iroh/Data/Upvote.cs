@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿/**using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Iroh.Data
@@ -23,3 +23,4 @@ namespace Iroh.Data
         public string UserId { get; set; }
     }
 }
+**/

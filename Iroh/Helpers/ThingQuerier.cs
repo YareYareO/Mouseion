@@ -1,9 +1,9 @@
-﻿using System.Diagnostics;
+﻿/* using System.Diagnostics;
 using Iroh.Data;
 
 namespace Iroh.Helpers
 {
-    public class ThingQuerier
+    public class ThingQuerier // Still has some features (sort by upvotes etc. that could be usefull later on)
     {
         private readonly ApplicationDbContext _context;
         private Subject subject;
@@ -96,4 +96,4 @@ namespace Iroh.Helpers
 
         
     }
-}
+} */

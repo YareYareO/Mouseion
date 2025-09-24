@@ -1,4 +1,4 @@
-﻿using Iroh.Data;
+using Iroh.Data;
 using Microsoft.EntityFrameworkCore;
 //using Iroh.Helpers;
 
@@ -15,8 +15,6 @@ namespace Iroh.Services
 
         public async Task<List<Thing>> GetThingsByTags(List<int> tags, string sortBy, Subject subject, int currentPage)
         {
-            //ThingQuerier querier = new ThingQuerier(context: _context, chosentags: tags, currentPage: currentPage, sortBy: sortBy, subject: subject);
-            //var things = await querier.GetSortedThings().ToListAsync();
             var things = from description in _context.Descriptions
                 where tags.Contains(description.TagId)
                 group description by description.ThingId into g
@@ -35,8 +33,6 @@ namespace Iroh.Services
         }
         public async Task<List<Thing>> GetThingsNoTags(string sortBy, Subject subject, int currentPage)
         {
-            //ThingQuerier querier = new ThingQuerier(context: _context, currentPage: currentPage, sortBy: sortBy, subject: subject);
-            //var things = await querier.GetSortedThings().ToListAsync();
             var idk = from thing in _context.Things
                 where thing.App == subject
                 orderby thing.CreatedAt
@@ -46,7 +42,6 @@ namespace Iroh.Services
                     .Take(15)
                     .Select(x => new Thing { Name = x.Name, Description = x.Description }).ToListAsync();
             return result;
-            //return things;
         }
         public async Task<List<Thing>> GetThingsByCreator(string creator)
         {

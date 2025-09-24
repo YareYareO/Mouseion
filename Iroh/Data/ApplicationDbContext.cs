@@ -1,20 +1,19 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Iroh.Data
 {
-    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : IdentityDbContext<ApplicationUser>(options)
+    public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
         public DbSet<Thing> Things {  get; set; } = default!;
         public DbSet<Tag> Tags { get; set; } = default!;
-        public DbSet<Upvote> Upvotes { get; set; } = default!;
+        //public DbSet<Upvote> Upvotes { get; set; } = default!;
         public DbSet<Description> Descriptions { get; set; } = default!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Upvote>().HasKey(upv => new { upv.UserId, upv.ThingId });
+            //modelBuilder.Entity<Upvote>().HasKey(upv => new { upv.UserId, upv.ThingId });
             modelBuilder.Entity<Description>().HasKey(desc => new { desc.ThingId, desc.TagId});
 
             modelBuilder.Entity<Tag>().HasData(
@@ -53,13 +52,6 @@ namespace Iroh.Data
                 new Tag { Id = 29, Name = "Fish", Family = TagFamily.Animal},
                 new Tag { Id = 30, Name = "Mammal", Family = TagFamily.Animal},
                 new Tag { Id = 31, Name = "Reptile", Family = TagFamily.Animal},
-
-                /* new Tag { Id = 1, Name = "Tree", Family = TagFamily.Plant},
-                new Tag { Id = 1, Name = "Flower", Family = TagFamily.Plant},
-                new Tag { Id = 1, Name = "Fruit", Family = TagFamily.Plant},
-                new Tag { Id = 1, Name = "Mosses or Liverworts", Family = TagFamily.Plant},
-                new Tag { Id = 1, Name = "Vegetable", Family = TagFamily.Plant}, */
-
 
                 new Tag { Id = 32, Name = "Battles", Family = TagFamily.Event},
                 new Tag { Id = 33, Name = "Discovery", Family = TagFamily.Event},
@@ -107,32 +99,13 @@ namespace Iroh.Data
                 new Tag { Id = 70, Name = "Universal Utility", Family = TagFamily.Invention},
                 new Tag { Id = 71, Name = "Chemical", Family = TagFamily.Invention},
 
-                new Tag { Id = 72, Name = "Europe", Family = TagFamily.Region},
-                new Tag { Id = 73, Name = "Africa", Family = TagFamily.Region},
-                new Tag { Id = 74, Name = "Asia", Family = TagFamily.Region},
-                new Tag { Id = 75, Name = "Middle East", Family = TagFamily.Region},
-                new Tag { Id = 76, Name = "North America", Family = TagFamily.Region},
-                new Tag { Id = 77, Name = "Oceania", Family = TagFamily.Region},
-                new Tag { Id = 78, Name = "Ocean", Family = TagFamily.Region},
-                new Tag { Id = 79, Name = "South America", Family = TagFamily.Region},
-                
-                new Tag { Id = 80, Name = "21th Century", Family = TagFamily.Time },
-                new Tag { Id = 81, Name = "20th Century", Family = TagFamily.Time},
-                new Tag { Id = 82, Name = "19th Century", Family = TagFamily.Time},
-                new Tag { Id = 83, Name = "18th Century", Family = TagFamily.Time},
-                new Tag { Id = 84, Name = "17th Century", Family = TagFamily.Time},
-                new Tag { Id = 85, Name = "16th Century", Family = TagFamily.Time},
-                new Tag { Id = 86, Name = "5th to 15th Century", Family = TagFamily.Time},
-                new Tag { Id = 87, Name = "Ancient to 4th Century", Family = TagFamily.Time},
-                new Tag { Id = 88, Name = "Pre Historic", Family = TagFamily.Time},
-
                 new Tag { Id = 89, Name = "Archaeology", Family = TagFamily.Science},
-                new Tag { Id = 90, Name = "Astrology :)", Family = TagFamily.Science},
+                new Tag { Id = 90, Name = "Astrology:)", Family = TagFamily.Science},
                 new Tag { Id = 91, Name = "Astronomy", Family = TagFamily.Science},
                 new Tag { Id = 92, Name = "Biology", Family = TagFamily.Science},
                 new Tag { Id = 93, Name = "Chemistry", Family = TagFamily.Science},
                 new Tag { Id = 94, Name = "Economy", Family = TagFamily.Science},
-                new Tag { Id = 95, Name = "Neurological", Family = TagFamily.Science},
+                new Tag { Id = 95, Name = "Neurology", Family = TagFamily.Science},
                 new Tag { Id = 96, Name = "Psychology", Family = TagFamily.Science},
                 new Tag { Id = 97, Name = "Physics", Family = TagFamily.Science},
                 new Tag { Id = 98, Name = "Sociology", Family = TagFamily.Science},
@@ -214,11 +187,29 @@ namespace Iroh.Data
                 new Tag { Id = 168, Name = "Shooter", Family = TagFamily.VideoGameGenre},
                 new Tag { Id = 169, Name = "Sandbox", Family = TagFamily.VideoGameGenre},
 
-                new Tag { Id = 170, Name = "Fictional", Family = TagFamily.Reality},
-                new Tag { Id = 171, Name = "Mythological", Family = TagFamily.Reality},
-                new Tag { Id = 172, Name = "Religious", Family = TagFamily.Reality}
+                new Tag { Id = 900, Name = "Europe", Family = TagFamily.Region},
+                new Tag { Id = 901, Name = "Africa", Family = TagFamily.Region},
+                new Tag { Id = 902, Name = "Asia", Family = TagFamily.Region},
+                new Tag { Id = 903, Name = "Middle East", Family = TagFamily.Region},
+                new Tag { Id = 904, Name = "North America", Family = TagFamily.Region},
+                new Tag { Id = 905, Name = "Oceania", Family = TagFamily.Region},
+                new Tag { Id = 906, Name = "Ocean", Family = TagFamily.Region},
+                new Tag { Id = 907, Name = "South America", Family = TagFamily.Region},
 
-                // TODO Regeln und Guidelines aufschreiben
+                new Tag { Id = 908, Name = "21th Century", Family = TagFamily.Time },
+                new Tag { Id = 909, Name = "20th Century", Family = TagFamily.Time},
+                new Tag { Id = 910, Name = "19th Century", Family = TagFamily.Time},
+                new Tag { Id = 911, Name = "18th Century", Family = TagFamily.Time},
+                new Tag { Id = 912, Name = "17th Century", Family = TagFamily.Time},
+                new Tag { Id = 913, Name = "16th Century", Family = TagFamily.Time},
+                new Tag { Id = 914, Name = "5th to 15th Century", Family = TagFamily.Time},
+                new Tag { Id = 915, Name = "Ancient to 4th Century", Family = TagFamily.Time},
+                new Tag { Id = 916, Name = "Pre Historic", Family = TagFamily.Time},
+
+                new Tag { Id = 917, Name = "Factual", Family = TagFamily.Domain},
+                new Tag { Id = 918, Name = "Fictional", Family = TagFamily.Domain},
+                new Tag { Id = 919, Name = "Mythological", Family = TagFamily.Domain},
+                new Tag { Id = 920, Name = "Religious", Family = TagFamily.Domain}
         );
         }
     }

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Iroh.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250906120238_AddSeed")]
-    partial class AddSeed
+    [Migration("20250924122114_InitPls")]
+    partial class InitPls
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,70 +24,6 @@ namespace Iroh.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Iroh.Data.ApplicationUser", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<int>("AccessFailedCount")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Email")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<bool>("EmailConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("LockoutEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTimeOffset?>("LockoutEnd")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("NormalizedEmail")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedUserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("PasswordHash")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("PhoneNumberConfirmed")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("SecurityStamp")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("TwoFactorEnabled")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("UserName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedEmail")
-                        .HasDatabaseName("EmailIndex");
-
-                    b.HasIndex("NormalizedUserName")
-                        .IsUnique()
-                        .HasDatabaseName("UserNameIndex");
-
-                    b.ToTable("AspNetUsers", (string)null);
-                });
 
             modelBuilder.Entity("Iroh.Data.Description", b =>
                 {
@@ -509,649 +445,655 @@ namespace Iroh.Migrations
                         new
                         {
                             Id = 65,
-                            Family = 20,
+                            Family = 10,
                             Name = "Home Utility"
                         },
                         new
                         {
                             Id = 66,
-                            Family = 20,
+                            Family = 10,
                             Name = "Survival"
                         },
                         new
                         {
                             Id = 67,
-                            Family = 20,
+                            Family = 10,
                             Name = "Labor Utility"
                         },
                         new
                         {
                             Id = 68,
-                            Family = 20,
+                            Family = 10,
                             Name = "Electronic"
                         },
                         new
                         {
                             Id = 69,
-                            Family = 20,
+                            Family = 10,
                             Name = "Quality of Life"
                         },
                         new
                         {
                             Id = 70,
-                            Family = 20,
+                            Family = 10,
                             Name = "Universal Utility"
                         },
                         new
                         {
                             Id = 71,
-                            Family = 20,
+                            Family = 10,
                             Name = "Chemical"
                         },
                         new
                         {
-                            Id = 72,
-                            Family = 10,
-                            Name = "Europe"
-                        },
-                        new
-                        {
-                            Id = 73,
-                            Family = 10,
-                            Name = "Africa"
-                        },
-                        new
-                        {
-                            Id = 74,
-                            Family = 10,
-                            Name = "Asia"
-                        },
-                        new
-                        {
-                            Id = 75,
-                            Family = 10,
-                            Name = "Middle East"
-                        },
-                        new
-                        {
-                            Id = 76,
-                            Family = 10,
-                            Name = "North America"
-                        },
-                        new
-                        {
-                            Id = 77,
-                            Family = 10,
-                            Name = "Oceania"
-                        },
-                        new
-                        {
-                            Id = 78,
-                            Family = 10,
-                            Name = "Ocean"
-                        },
-                        new
-                        {
-                            Id = 79,
-                            Family = 10,
-                            Name = "South America"
-                        },
-                        new
-                        {
-                            Id = 80,
-                            Family = 11,
-                            Name = "21th Century"
-                        },
-                        new
-                        {
-                            Id = 81,
-                            Family = 11,
-                            Name = "20th Century"
-                        },
-                        new
-                        {
-                            Id = 82,
-                            Family = 11,
-                            Name = "19th Century"
-                        },
-                        new
-                        {
-                            Id = 83,
-                            Family = 11,
-                            Name = "18th Century"
-                        },
-                        new
-                        {
-                            Id = 84,
-                            Family = 11,
-                            Name = "17th Century"
-                        },
-                        new
-                        {
-                            Id = 85,
-                            Family = 11,
-                            Name = "16th Century"
-                        },
-                        new
-                        {
-                            Id = 86,
-                            Family = 11,
-                            Name = "5th to 15th Century"
-                        },
-                        new
-                        {
-                            Id = 87,
-                            Family = 11,
-                            Name = "Ancient to 4th Century"
-                        },
-                        new
-                        {
-                            Id = 88,
-                            Family = 11,
-                            Name = "Pre Historic"
-                        },
-                        new
-                        {
                             Id = 89,
-                            Family = 13,
+                            Family = 101,
                             Name = "Archaeology"
                         },
                         new
                         {
                             Id = 90,
-                            Family = 13,
-                            Name = "Astrology :)"
+                            Family = 101,
+                            Name = "Astrology:)"
                         },
                         new
                         {
                             Id = 91,
-                            Family = 13,
+                            Family = 101,
                             Name = "Astronomy"
                         },
                         new
                         {
                             Id = 92,
-                            Family = 13,
+                            Family = 101,
                             Name = "Biology"
                         },
                         new
                         {
                             Id = 93,
-                            Family = 13,
+                            Family = 101,
                             Name = "Chemistry"
                         },
                         new
                         {
                             Id = 94,
-                            Family = 13,
+                            Family = 101,
                             Name = "Economy"
                         },
                         new
                         {
                             Id = 95,
-                            Family = 13,
-                            Name = "Neurological"
+                            Family = 101,
+                            Name = "Neurology"
                         },
                         new
                         {
                             Id = 96,
-                            Family = 13,
+                            Family = 101,
                             Name = "Psychology"
                         },
                         new
                         {
                             Id = 97,
-                            Family = 13,
+                            Family = 101,
                             Name = "Physics"
                         },
                         new
                         {
                             Id = 98,
-                            Family = 13,
+                            Family = 101,
                             Name = "Sociology"
                         },
                         new
                         {
                             Id = 99,
-                            Family = 14,
+                            Family = 102,
                             Name = "Basketball"
                         },
                         new
                         {
                             Id = 100,
-                            Family = 14,
+                            Family = 102,
                             Name = "Car Racing"
                         },
                         new
                         {
                             Id = 101,
-                            Family = 14,
+                            Family = 102,
                             Name = "Esports"
                         },
                         new
                         {
                             Id = 102,
-                            Family = 14,
+                            Family = 102,
                             Name = "Football"
                         },
                         new
                         {
                             Id = 103,
-                            Family = 14,
+                            Family = 102,
                             Name = "Martial Arts"
                         },
                         new
                         {
                             Id = 104,
-                            Family = 14,
+                            Family = 102,
                             Name = "Rugby or American Football"
                         },
                         new
                         {
                             Id = 105,
-                            Family = 14,
+                            Family = 102,
                             Name = "Running"
                         },
                         new
                         {
                             Id = 106,
-                            Family = 14,
+                            Family = 102,
                             Name = "Swimming"
                         },
                         new
                         {
                             Id = 107,
-                            Family = 14,
+                            Family = 102,
                             Name = "Tennis"
                         },
                         new
                         {
                             Id = 108,
-                            Family = 14,
+                            Family = 102,
                             Name = "Volleyball"
                         },
                         new
                         {
                             Id = 109,
-                            Family = 14,
+                            Family = 102,
                             Name = "Weightlifting"
                         },
                         new
                         {
                             Id = 110,
-                            Family = 14,
+                            Family = 102,
                             Name = "Other Sport"
                         },
                         new
                         {
                             Id = 111,
-                            Family = 12,
+                            Family = 100,
                             Name = "About Children"
                         },
                         new
                         {
                             Id = 112,
-                            Family = 12,
+                            Family = 100,
                             Name = "Advice"
                         },
                         new
                         {
                             Id = 113,
-                            Family = 12,
+                            Family = 100,
                             Name = "Art or Photography"
                         },
                         new
                         {
                             Id = 114,
-                            Family = 12,
+                            Family = 100,
                             Name = "Biography"
                         },
                         new
                         {
                             Id = 115,
-                            Family = 12,
+                            Family = 100,
                             Name = "Commentary"
                         },
                         new
                         {
                             Id = 116,
-                            Family = 12,
+                            Family = 100,
                             Name = "Documentary"
                         },
                         new
                         {
                             Id = 117,
-                            Family = 12,
+                            Family = 100,
                             Name = "Finance"
                         },
                         new
                         {
                             Id = 118,
-                            Family = 12,
+                            Family = 100,
                             Name = "Guide"
                         },
                         new
                         {
                             Id = 119,
-                            Family = 12,
+                            Family = 100,
                             Name = "Memoir"
                         },
                         new
                         {
                             Id = 120,
-                            Family = 12,
+                            Family = 100,
                             Name = "Parenting"
                         },
                         new
                         {
                             Id = 121,
-                            Family = 12,
+                            Family = 100,
                             Name = "Past Civilization"
                         },
                         new
                         {
                             Id = 122,
-                            Family = 12,
+                            Family = 100,
                             Name = "Philosophy"
                         },
                         new
                         {
                             Id = 123,
-                            Family = 12,
+                            Family = 100,
                             Name = "Political"
                         },
                         new
                         {
                             Id = 124,
-                            Family = 12,
+                            Family = 100,
                             Name = "Self-Help"
                         },
                         new
                         {
                             Id = 125,
-                            Family = 12,
+                            Family = 100,
                             Name = "Personal Relationship"
                         },
                         new
                         {
                             Id = 126,
-                            Family = 12,
+                            Family = 100,
                             Name = "Religion"
                         },
                         new
                         {
                             Id = 127,
-                            Family = 12,
+                            Family = 100,
                             Name = "Technology"
                         },
                         new
                         {
                             Id = 128,
-                            Family = 12,
+                            Family = 100,
                             Name = "True Crime"
                         },
                         new
                         {
                             Id = 129,
-                            Family = 15,
+                            Family = 103,
                             Name = "Action"
                         },
                         new
                         {
                             Id = 130,
-                            Family = 15,
+                            Family = 103,
                             Name = "Adventure"
                         },
                         new
                         {
                             Id = 131,
-                            Family = 15,
+                            Family = 103,
                             Name = "Crime"
                         },
                         new
                         {
                             Id = 132,
-                            Family = 15,
+                            Family = 103,
                             Name = "Drama"
                         },
                         new
                         {
                             Id = 133,
-                            Family = 15,
+                            Family = 103,
                             Name = "Dystopian"
                         },
                         new
                         {
                             Id = 134,
-                            Family = 15,
+                            Family = 103,
                             Name = "Fantasy"
                         },
                         new
                         {
                             Id = 135,
-                            Family = 15,
+                            Family = 103,
                             Name = "Historical"
                         },
                         new
                         {
                             Id = 136,
-                            Family = 15,
+                            Family = 103,
                             Name = "Horror"
                         },
                         new
                         {
                             Id = 137,
-                            Family = 15,
+                            Family = 103,
                             Name = "Mystery"
                         },
                         new
                         {
                             Id = 138,
-                            Family = 15,
+                            Family = 103,
                             Name = "Noir"
                         },
                         new
                         {
                             Id = 139,
-                            Family = 15,
+                            Family = 103,
                             Name = "Romance"
                         },
                         new
                         {
                             Id = 140,
-                            Family = 15,
+                            Family = 103,
                             Name = "Satire"
                         },
                         new
                         {
                             Id = 141,
-                            Family = 15,
+                            Family = 103,
                             Name = "Science Fiction"
                         },
                         new
                         {
                             Id = 142,
-                            Family = 15,
+                            Family = 103,
                             Name = "Seinen"
                         },
                         new
                         {
                             Id = 143,
-                            Family = 15,
+                            Family = 103,
                             Name = "Shoji"
                         },
                         new
                         {
                             Id = 144,
-                            Family = 15,
+                            Family = 103,
                             Name = "Shonen"
                         },
                         new
                         {
                             Id = 145,
-                            Family = 15,
+                            Family = 103,
                             Name = "Swashbuckle"
                         },
                         new
                         {
                             Id = 146,
-                            Family = 15,
+                            Family = 103,
                             Name = "Thriller"
                         },
                         new
                         {
                             Id = 147,
-                            Family = 16,
+                            Family = 104,
                             Name = "Fun or Comedy"
                         },
                         new
                         {
                             Id = 148,
-                            Family = 16,
+                            Family = 104,
                             Name = "Indie"
                         },
                         new
                         {
                             Id = 149,
-                            Family = 16,
+                            Family = 104,
                             Name = "Safe For Children"
                         },
                         new
                         {
                             Id = 150,
-                            Family = 16,
+                            Family = 104,
                             Name = "Was Banned Somewhere"
                         },
                         new
                         {
                             Id = 151,
-                            Family = 17,
+                            Family = 105,
                             Name = "Classical"
                         },
                         new
                         {
                             Id = 152,
-                            Family = 17,
+                            Family = 105,
                             Name = "Electronic"
                         },
                         new
                         {
                             Id = 153,
-                            Family = 17,
+                            Family = 105,
                             Name = "Hip-Hop"
                         },
                         new
                         {
                             Id = 154,
-                            Family = 17,
+                            Family = 105,
                             Name = "Jazz"
                         },
                         new
                         {
                             Id = 155,
-                            Family = 17,
+                            Family = 105,
                             Name = "Metal"
                         },
                         new
                         {
                             Id = 156,
-                            Family = 17,
+                            Family = 105,
                             Name = "Pop"
                         },
                         new
                         {
                             Id = 157,
-                            Family = 17,
+                            Family = 105,
                             Name = "Reggae"
                         },
                         new
                         {
                             Id = 158,
-                            Family = 17,
+                            Family = 105,
                             Name = "R&B"
                         },
                         new
                         {
                             Id = 159,
-                            Family = 17,
+                            Family = 105,
                             Name = "Rock"
                         },
                         new
                         {
                             Id = 160,
-                            Family = 17,
+                            Family = 105,
                             Name = "Soundtrack"
                         },
                         new
                         {
                             Id = 161,
-                            Family = 18,
+                            Family = 106,
                             Name = "2D"
                         },
                         new
                         {
                             Id = 162,
-                            Family = 18,
+                            Family = 106,
                             Name = "3D"
                         },
                         new
                         {
                             Id = 163,
-                            Family = 18,
+                            Family = 106,
                             Name = "Action"
                         },
                         new
                         {
                             Id = 164,
-                            Family = 18,
+                            Family = 106,
                             Name = "Puzzle"
                         },
                         new
                         {
                             Id = 165,
-                            Family = 18,
+                            Family = 106,
                             Name = "Multiplayer"
                         },
                         new
                         {
                             Id = 166,
-                            Family = 18,
+                            Family = 106,
                             Name = "RPG"
                         },
                         new
                         {
                             Id = 167,
-                            Family = 18,
+                            Family = 106,
                             Name = "Simulation"
                         },
                         new
                         {
                             Id = 168,
-                            Family = 18,
+                            Family = 106,
                             Name = "Shooter"
                         },
                         new
                         {
                             Id = 169,
-                            Family = 18,
+                            Family = 106,
                             Name = "Sandbox"
                         },
                         new
                         {
-                            Id = 170,
-                            Family = 19,
+                            Id = 900,
+                            Family = 200,
+                            Name = "Europe"
+                        },
+                        new
+                        {
+                            Id = 901,
+                            Family = 200,
+                            Name = "Africa"
+                        },
+                        new
+                        {
+                            Id = 902,
+                            Family = 200,
+                            Name = "Asia"
+                        },
+                        new
+                        {
+                            Id = 903,
+                            Family = 200,
+                            Name = "Middle East"
+                        },
+                        new
+                        {
+                            Id = 904,
+                            Family = 200,
+                            Name = "North America"
+                        },
+                        new
+                        {
+                            Id = 905,
+                            Family = 200,
+                            Name = "Oceania"
+                        },
+                        new
+                        {
+                            Id = 906,
+                            Family = 200,
+                            Name = "Ocean"
+                        },
+                        new
+                        {
+                            Id = 907,
+                            Family = 200,
+                            Name = "South America"
+                        },
+                        new
+                        {
+                            Id = 908,
+                            Family = 201,
+                            Name = "21th Century"
+                        },
+                        new
+                        {
+                            Id = 909,
+                            Family = 201,
+                            Name = "20th Century"
+                        },
+                        new
+                        {
+                            Id = 910,
+                            Family = 201,
+                            Name = "19th Century"
+                        },
+                        new
+                        {
+                            Id = 911,
+                            Family = 201,
+                            Name = "18th Century"
+                        },
+                        new
+                        {
+                            Id = 912,
+                            Family = 201,
+                            Name = "17th Century"
+                        },
+                        new
+                        {
+                            Id = 913,
+                            Family = 201,
+                            Name = "16th Century"
+                        },
+                        new
+                        {
+                            Id = 914,
+                            Family = 201,
+                            Name = "5th to 15th Century"
+                        },
+                        new
+                        {
+                            Id = 915,
+                            Family = 201,
+                            Name = "Ancient to 4th Century"
+                        },
+                        new
+                        {
+                            Id = 916,
+                            Family = 201,
+                            Name = "Pre Historic"
+                        },
+                        new
+                        {
+                            Id = 917,
+                            Family = 202,
+                            Name = "Factual"
+                        },
+                        new
+                        {
+                            Id = 918,
+                            Family = 202,
                             Name = "Fictional"
                         },
                         new
                         {
-                            Id = 171,
-                            Family = 19,
+                            Id = 919,
+                            Family = 202,
                             Name = "Mythological"
                         },
                         new
                         {
-                            Id = 172,
-                            Family = 19,
+                            Id = 920,
+                            Family = 202,
                             Name = "Religious"
                         });
                 });
@@ -1172,14 +1114,17 @@ namespace Iroh.Migrations
 
                     b.Property<string>("Creator")
                         .IsRequired()
+                        .HasMaxLength(32)
                         .HasColumnType("varchar(450)");
 
                     b.Property<string>("Description")
                         .IsRequired()
+                        .HasMaxLength(512)
                         .HasColumnType("varchar(512)");
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
                     b.Property<int>("Upvotes")
@@ -1187,203 +1132,10 @@ namespace Iroh.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Name")
+                        .IsUnique();
+
                     b.ToTable("Things");
-                });
-
-            modelBuilder.Entity("Iroh.Data.Upvote", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<int>("ThingId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("UserId", "ThingId");
-
-                    b.ToTable("Upvotes");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ConcurrencyStamp")
-                        .IsConcurrencyToken()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("NormalizedName")
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NormalizedName")
-                        .IsUnique()
-                        .HasDatabaseName("RoleNameIndex");
-
-                    b.ToTable("AspNetRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetRoleClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ClaimType")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ClaimValue")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserClaims", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProviderKey")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ProviderDisplayName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("LoginProvider", "ProviderKey");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("AspNetUserLogins", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("RoleId")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId", "RoleId");
-
-                    b.HasIndex("RoleId");
-
-                    b.ToTable("AspNetUserRoles", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.Property<string>("UserId")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LoginProvider")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("text");
-
-                    b.HasKey("UserId", "LoginProvider", "Name");
-
-                    b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
-                {
-                    b.HasOne("Iroh.Data.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
-                {
-                    b.HasOne("Iroh.Data.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
-                        .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Iroh.Data.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
-                {
-                    b.HasOne("Iroh.Data.ApplicationUser", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
