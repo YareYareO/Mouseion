@@ -1,6 +1,5 @@
 using Iroh.Data;
 using Microsoft.EntityFrameworkCore;
-//using Iroh.Helpers;
 
 namespace Iroh.Services
 {
@@ -9,7 +8,7 @@ namespace Iroh.Services
         private readonly ApplicationDbContext _context = context;
         public async Task<List<Tag>> GetTagsByFamilies(TagFamily[] families)
         {
-            var tags = await _context.Tags.Where(tag => families.Contains(tag.Family)).ToListAsync();
+            var tags = await _context.Tags.Where(tag => families.Contains(tag.Family)).AsNoTracking().ToListAsync();
             return tags;
         }
 
@@ -27,7 +26,8 @@ namespace Iroh.Services
                           select new { thing.Name, thing.Description })
                     .Skip((currentPage - 1) * 15)
                     .Take(15)
-                    .Select(x => new Thing { Name = x.Name, Description = x.Description });
+                    .Select(x => new Thing { Name = x.Name, Description = x.Description })
+                    .AsNoTracking();
                     
             return await result.ToListAsync();
         }
@@ -40,7 +40,7 @@ namespace Iroh.Services
             var result = await idk
                     .Skip((currentPage - 1) * 15)
                     .Take(15)
-                    .Select(x => new Thing { Name = x.Name, Description = x.Description }).ToListAsync();
+                    .Select(x => new Thing { Name = x.Name, Description = x.Description }).AsNoTracking().ToListAsync();
             return result;
         }
         public async Task<List<Thing>> GetThingsByCreator(string creator)
