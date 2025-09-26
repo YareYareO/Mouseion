@@ -155,7 +155,7 @@
             NavigationManager.NavigateTo($"/");
         }
         TagFamily[] families = TagService.GetSubjectFamilies(currentSubject);
-        List<Tag> tags = await SearchThingService.GetTagsByFamilies(families);
+        List<Tag> tags = await TagService.GetTagsByFamilies(families);
             
         // DO NOT add tags to constructer of CPage. if the wait is too long, the page will crash because EditContext cant initialize properly.
         page = new CPage(currentSubject); 

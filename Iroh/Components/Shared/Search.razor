@@ -92,7 +92,7 @@
     {
         Console.WriteLine("ONINITIALIZED");
         TagFamily[] families = TagService.GetSubjectFamilies(currentSubject);
-        tags = await SearchThingService.GetTagsByFamilies(families);
+        tags = await TagService.GetTagsByFamilies(families);
         chosen = new bool[tags.Count];
         currentPage = 1;
         isPopupVisible = false;

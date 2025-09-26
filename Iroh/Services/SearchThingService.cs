@@ -6,12 +6,6 @@ namespace Iroh.Services
     public class SearchThingService(ApplicationDbContext context) : ISearchThingService
     {
         private readonly ApplicationDbContext _context = context;
-        public async Task<List<Tag>> GetTagsByFamilies(TagFamily[] families)
-        {
-            var tags = await _context.Tags.Where(tag => families.Contains(tag.Family)).AsNoTracking().ToListAsync();
-            return tags;
-        }
-
         public async Task<List<Thing>> GetThingsByTags(List<int> tags, string sortBy, Subject subject, int currentPage)
         {
             var things = from description in _context.Descriptions

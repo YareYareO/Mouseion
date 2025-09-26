@@ -1,12 +1,27 @@
 ﻿using Iroh.Data;
-using Microsoft.AspNetCore.Authorization.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Text.Json;
 
 namespace Iroh.Services
 {
-    public class TagService() : ITagService
+    public class TagService(ApplicationDbContext context) : ITagService
     {
+        public readonly ApplicationDbContext _context = context;
+
+        public static List<Tag> AllTags = [];
+
+        public async Task<List<Tag>> GetTagsByFamilies(TagFamily[] families)
+        {
+            if(AllTags.Count == 0)
+            {
+                AllTags = await _context.Tags.ToListAsync();
+                Console.WriteLine("TAGS INITIALISIERT.");
+                return AllTags.Where(tag => families.Contains(tag.Family)).ToList();
+            }
+            return AllTags.Where(tag => families.Contains(tag.Family)).ToList();    
+        }
+
         public Subject GetEnumByString(string name)
         {
             Subject[] apps = (Subject[])Enum.GetValues(typeof(Subject));
